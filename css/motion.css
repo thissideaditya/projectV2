@@ -1,0 +1,135 @@
+/* ===================================================================
+   ADA Law Chambers — motion.css
+   Page fade-in, scroll reveals and GST-themed ambient motion.
+   Everything here is progressive: if motion.js doesn't run, the page
+   renders exactly as before. Honors prefers-reduced-motion.
+=================================================================== */
+
+/* ---- 1. Page fade-in (opacity only, so fixed elements stay put) ---- */
+@keyframes ada-page-in { from { opacity: 0; } to { opacity: 1; } }
+body { animation: ada-page-in .7s ease-out both; }
+
+/* ---- 2. Scroll reveal ---- */
+@keyframes ada-rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes ada-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.reveal { opacity: 0; transform: translateY(26px); }
+.reveal--fade { transform: none; }
+.reveal.in {
+  opacity: 1; transform: none;
+  animation: ada-rise .75s cubic-bezier(.2,.7,.2,1) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+.reveal--fade.in { animation-name: ada-fade; }
+
+/* ---- 3. Scroll progress bar ---- */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 3px; width: 100%;
+  background: linear-gradient(90deg, var(--gold-600), var(--gold-400));
+  transform: scaleX(0); transform-origin: left; z-index: 9999; pointer-events: none;
+}
+
+/* ---- 4. Floating GST symbols (hero, CTA band, footer) ---- */
+.has-floaters { position: relative; overflow: hidden; }
+.has-floaters > .container { position: relative; z-index: 1; }
+.gst-floaters { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.gst-float {
+  position: absolute;
+  transform: translate(var(--dx, 0px), var(--dy, 0px));
+  transition: transform .5s cubic-bezier(.2,.7,.2,1);
+  will-change: transform;
+}
+.gst-float > span {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--size, 2rem);
+  line-height: 1;
+  color: var(--gold-400);
+  opacity: var(--alpha, .2);
+  animation: gst-drift var(--dur, 14s) ease-in-out var(--delay, 0s) infinite alternate;
+  transition: opacity .3s, color .3s;
+}
+.gst-float.near > span { opacity: .45; color: var(--gold-100); }
+.gst-float.mono > span { font-family: var(--font-caption); font-size: calc(var(--size, 2rem) * .55); letter-spacing: .08em; }
+.cta-band .gst-float > span { color: var(--green-950); }
+.cta-band .gst-float.near > span { opacity: .25; color: var(--green-900); }
+@keyframes gst-drift {
+  0%   { transform: translate(0, 0) rotate(-6deg); }
+  50%  { transform: translate(14px, -22px) rotate(4deg); }
+  100% { transform: translate(-10px, -40px) rotate(-3deg); }
+}
+.gst-floaters.paused .gst-float > span { animation-play-state: paused; }
+
+/* ---- 5. GST terms ticker ---- */
+.gst-ticker {
+  background: var(--green-900);
+  border-top: 1px solid rgba(201,162,39,.35);
+  border-bottom: 1px solid rgba(201,162,39,.35);
+  overflow: hidden; position: relative;
+}
+.gst-ticker::before, .gst-ticker::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 70px; z-index: 2; pointer-events: none;
+}
+.gst-ticker::before { left: 0;  background: linear-gradient(90deg, var(--green-900), transparent); }
+.gst-ticker::after  { right: 0; background: linear-gradient(-90deg, var(--green-900), transparent); }
+.gst-track { display: flex; width: max-content; animation: gst-scroll 60s linear infinite; }
+.gst-ticker:hover .gst-track, .gst-ticker:focus-within .gst-track { animation-play-state: paused; }
+.gst-group { display: flex; align-items: center; flex-shrink: 0; }
+@keyframes gst-scroll { to { transform: translateX(-50%); } }
+.gst-term {
+  appearance: none; background: none; border: 0; cursor: help;
+  font-family: var(--font-caption); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold-100); padding: .9rem 1.3rem; position: relative; white-space: nowrap;
+  transition: color .2s, transform .2s;
+}
+.gst-term::after { content: "\20B9"; position: absolute; right: -.35em; color: var(--gold-600); font-size: .8em; opacity: .7; }
+.gst-term:hover, .gst-term:focus-visible { color: var(--gold-400); transform: translateY(-2px) scale(1.08); }
+.gst-tip {
+  position: fixed; z-index: 10000; max-width: 280px; pointer-events: none;
+  background: var(--cream-50); color: var(--ink-900); border: 1px solid var(--gold-500);
+  border-radius: var(--radius-md); padding: .65rem .85rem; font-size: .88rem; line-height: 1.4;
+  box-shadow: var(--shadow-card); opacity: 0; transform: translateY(6px);
+  transition: opacity .18s, transform .18s;
+}
+.gst-tip b { display: block; font-family: var(--font-caption); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-700); margin-bottom: .2rem; }
+.gst-tip.show { opacity: 1; transform: none; }
+
+/* ---- 6. Small continuous accents ---- */
+@keyframes icon-bob { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-4px) rotate(-5deg); } }
+.card-icon { animation: icon-bob 4.5s ease-in-out infinite; }
+.card:nth-child(2n) .card-icon { animation-delay: -1.5s; }
+.card:nth-child(3n) .card-icon { animation-delay: -3s; }
+.card:hover .card-icon { animation-duration: 1.2s; }
+
+.divider-gold { position: relative; overflow: hidden; }
+.divider-gold::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent);
+  transform: translateX(-100%); animation: gold-shimmer 3.8s ease-in-out infinite;
+}
+@keyframes gold-shimmer { 55%, 100% { transform: translateX(100%); } }
+
+.hero-scales span { animation: tag-pulse 3.2s ease-in-out infinite; }
+@keyframes tag-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(201,162,39,0); } 50% { box-shadow: 0 0 0 6px rgba(201,162,39,.18); } }
+
+.hero-figure { transition: transform .25s ease-out; transform: perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)); }
+
+/* ---- Reduced motion: switch all of the above off ---- */
+@media (prefers-reduced-motion: reduce) {
+  body, .reveal.in, .card-icon, .divider-gold::after, .hero-scales span,
+  .gst-float > span, .gst-track { animation: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .gst-ticker { overflow-x: auto; }
+  .gst-float { transition: none; }
+  .scroll-progress { display: none; }
+}
+@media (max-width: 760px) {
+  .gst-term { padding: .75rem 1rem; }
+  .gst-ticker::before, .gst-ticker::after { width: 30px; }
+}

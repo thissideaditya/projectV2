@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article Editor — ADA Law Chambers Admin</title>
+<link rel="icon" href="../assets/images/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="../index.html" class="brand">
+      <img src="../assets/images/logo-header.webp" alt="ADA Law Chambers crest">
+      <span class="brand-text"><strong>ADA Law Chambers</strong><span>Admin Panel</span></span>
+    </a>
+    <nav class="admin-nav">
+      <a href="dashboard.html">Rules &amp; Thoughts</a>
+      <a href="editor.html">New Post</a>
+      <a href="articles.html" class="active">Articles</a>
+      <a href="links.html">Important Links</a>
+      <a href="resources.html">Resources</a>
+      <a href="messages.html">Messages</a>
+      <a href="applications.html">Applications</a>
+      <a href="../index.html">View Website</a>
+    </nav>
+    <div>
+      <p style="font-size:.78rem;color:rgba(244,233,201,.7);margin-bottom:.5rem;" id="admin-user-label"></p>
+      <button class="btn btn--outline btn--sm btn--full" data-logout>Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topline">
+      <div>
+        <h1 style="margin-bottom:.2rem;font-size:1.6rem;" id="article-editor-heading">New Article</h1>
+        <p style="margin:0;color:var(--ink-500);font-size:.9rem;">Upload a PDF, PPT, PPTX, DOC or DOCX for visitors to download.</p>
+      </div>
+    </div>
+
+    <form class="admin-card" id="article-form">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="article-title">Title</label>
+          <input id="article-title" required placeholder="e.g. Understanding GST Refunds — A Practical Guide">
+        </div>
+        <div class="field full">
+          <label for="article-description">Description (optional)</label>
+          <textarea id="article-description" style="min-height:100px;" placeholder="Shown on the public Articles page under the title."></textarea>
+        </div>
+        <div class="field full">
+          <label for="article-file">File (PDF, PPT, PPTX, DOC, or DOCX — max 20MB)</label>
+          <input id="article-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx">
+          <p class="form-note" id="article-file-label">No file chosen</p>
+        </div>
+        <div class="field">
+          <label for="article-status">Status</label>
+          <select id="article-status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:1.25rem;">
+        <button class="btn btn--gold" type="submit" id="article-save-btn">Save Article</button>
+        <a href="articles.html" class="btn btn--outline-dark">Cancel</a>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script src="../js/api-config.js"></script>
+<script src="../js/hostinger-client.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

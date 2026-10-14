@@ -1,0 +1,44 @@
+# ADA LAW Chambers — cache control
+#
+# Problem this solves: browsers cache .css and .js files aggressively
+# by default, so after uploading an updated admin.js or style.css to
+# Hostinger, visitors (including you, in the admin panel) can keep
+# seeing the OLD version until they hard-refresh or clear their cache.
+#
+# Fix: tell browsers to always check back with the server before
+# using a cached copy of CSS/JS ("must-revalidate"). If the file
+# hasn't changed, the server replies with a tiny "304 Not Modified"
+# and the browser uses its cached copy — fast, no re-download. If the
+# file HAS changed (you re-uploaded it), the browser gets the fresh
+# version immediately. Either way, you never see a stale file again.
+#
+# Images/fonts are left on a normal long cache since they rarely
+# change and don't cause this kind of bug when they're stale.
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(jpg|jpeg|png|gif|svg|webp|ico|woff|woff2)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>
+
+# ---------------------------------------------------------------
+# Old blog post links now go to post.php instead of post.html, so
+# link-preview bots (WhatsApp, Facebook, etc.) see the real per-post
+# title/image instead of a generic one. This keeps any already-
+# shared post.html?slug=... links working by sending them to the
+# same post on post.php instead of a broken/blank page.
+# ---------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{QUERY_STRING} ^slug=(.*)$
+  RewriteRule ^post\.html$ /post.php?slug=%1 [R=301,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(css|js|jpg|jpeg|png|webp|gif|svg)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>

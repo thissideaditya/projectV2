@@ -1,0 +1,35 @@
+# ADA LAW Chambers — security hardening for /uploads
+# This folder only ever holds files uploaded by visitors (resumes)
+# and admins (post images). Even though api/careers.php and
+# api/upload-image.php validate file type and content, this is a
+# defense-in-depth measure: nothing in this folder should ever be
+# allowed to execute as a script, no matter what it's named.
+
+# Apache 2.4+
+<IfModule mod_authz_core.c>
+  <FilesMatch "\.(php|php\d|phtml|pht|phar|cgi|pl|py|sh|asp|aspx)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+
+# Apache 2.2 (older Hostinger stacks)
+<IfModule !mod_authz_core.c>
+  <FilesMatch "\.(php|php\d|phtml|pht|phar|cgi|pl|py|sh|asp|aspx)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>
+
+# Belt-and-braces: turn off PHP execution in this folder entirely if
+# the PHP handler is running as an Apache module.
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+  php_flag engine off
+</IfModule>
+
+Options -Indexes

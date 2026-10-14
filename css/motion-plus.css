@@ -1,0 +1,169 @@
+/* ===================================================================
+   ADA Law Chambers — motion-plus.css
+   The heavier layer: GST flow lab, particle network, cursor ring,
+   spotlight cards, magnetic buttons, coin bursts, page transitions.
+   Companion to motion.css; everything respects prefers-reduced-motion.
+=================================================================== */
+
+/* ---- Hero particle network ---- */
+.gst-net { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+/* ---- Hero typing ---- */
+.tw { visibility: hidden; }
+.tw.on { visibility: visible; }
+.tw.cur { position: relative; }
+.tw.cur::after {
+  content: ""; position: absolute; right: -6px; top: .12em; bottom: .12em; width: 2px;
+  background: var(--gold-400); animation: tw-blink .5s steps(1) infinite;
+}
+@keyframes tw-blink { 50% { opacity: 0; } }
+.hero-cta { transition: opacity .5s ease, transform .5s ease; }
+/* Hidden from the very first paint (the .js class is set in <head>), shown when typing ends */
+.js .hero .eyebrow, .js .hero h1, .js .hero .lede { visibility: hidden; }
+.js .hero .tw.on { visibility: visible; }
+.js .hero .hero-cta { opacity: 0; transform: translateY(8px); }
+.js .hero .hero-cta.tw-done { opacity: 1; transform: none; }
+
+/* ---- Cursor ring ---- */
+.cursor-ring {
+  position: fixed; left: 0; top: 0; width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  border: 1.5px solid var(--gold-500); border-radius: 50%; pointer-events: none; z-index: 10001;
+  opacity: 0; transition: width .2s, height .2s, margin .2s, background .2s, opacity .3s, border-color .2s;
+  mix-blend-mode: normal;
+}
+.cursor-ring.on { opacity: .85; }
+.cursor-ring.big { width: 62px; height: 62px; margin: -31px 0 0 -31px; background: rgba(201,162,39,.14); }
+.cursor-ring.down { width: 22px; height: 22px; margin: -11px 0 0 -11px; background: rgba(201,162,39,.35); }
+.cursor-dot { position: fixed; left: 0; top: 0; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--gold-500); pointer-events: none; z-index: 10001; opacity: 0; transition: opacity .3s; }
+.cursor-dot.on { opacity: 1; }
+/* Over the gold CTA band the gold cursor disappears, so switch it to the deep green */
+.cursor-ring.on-gold { border-color: var(--green-950); }
+.cursor-ring.on-gold.big { background: rgba(11, 33, 24, .12); }
+.cursor-ring.on-gold.down { background: rgba(11, 33, 24, .25); }
+.cursor-dot.on-gold { background: var(--green-950); }
+
+/* ---- Spotlight on cards ---- */
+.card { position: relative; overflow: hidden; isolation: isolate; }
+.card::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(201,162,39,.2), transparent 70%);
+}
+.card:hover::before { opacity: 1; }
+
+/* ---- Magnetic buttons (uses the independent `translate` property) ---- */
+.btn { translate: var(--bx, 0px) var(--by, 0px); transition: translate .25s cubic-bezier(.2,.8,.2,1), background .2s, transform .25s, color .2s, border-color .2s; }
+
+/* ---- Coin burst ---- */
+.coin-burst {
+  position: fixed; z-index: 10002; pointer-events: none; font-family: var(--font-display); font-weight: 700;
+  color: var(--gold-500); text-shadow: 0 1px 0 rgba(0,0,0,.15); font-size: 1.1rem;
+  animation: coin-pop .9s cubic-bezier(.15,.7,.3,1) forwards;
+}
+@keyframes coin-pop {
+  0% { transform: translate(0,0) scale(.4) rotate(0); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1.1) rotate(var(--rot)); opacity: 0; }
+}
+
+/* ---- Page transition ---- */
+body { transition: opacity .25s ease; }
+body.page-out { opacity: 0; }
+
+/* ---- Back-to-top coin ---- */
+.coin-top {
+  position: fixed; left: 1.3rem; bottom: 1.3rem; width: 54px; height: 54px; z-index: 900; border: 0; padding: 0; background: none;
+  perspective: 400px; opacity: 0; pointer-events: none; transform: translateY(20px); transition: opacity .3s, transform .3s;
+}
+.coin-top.show { opacity: 1; pointer-events: auto; transform: none; }
+.coin-top span {
+  display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--gold-400), var(--gold-600));
+  color: var(--green-950); font: 700 1.5rem var(--font-display); border: 2px solid var(--gold-700);
+  box-shadow: 0 8px 18px -6px rgba(11,33,24,.55); animation: coin-spin 4s linear infinite;
+}
+.coin-top:hover span { animation-duration: 1s; }
+@keyframes coin-spin { to { transform: rotateY(360deg); } }
+body.disclaimer-active .coin-top { display: none; }
+
+/* ===================================================================
+   GST LAB
+=================================================================== */
+.gst-lab { background: linear-gradient(180deg, var(--cream-50), var(--cream-100)); }
+.lab-controls { display: flex; flex-wrap: wrap; gap: 1.2rem 2rem; align-items: center; margin-bottom: 2rem; padding: 1.1rem 1.4rem; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow-card); }
+.lab-group { display: flex; flex-direction: column; gap: .4rem; }
+.lab-group > label, .lab-group > .lab-label { font-family: var(--font-caption); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-700); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.seg button { border: 0; background: var(--cream-50); padding: .55rem 1rem; font-weight: 600; font-size: .9rem; color: var(--ink-700); transition: background .2s, color .2s; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--green-900); color: var(--gold-400); }
+.seg button:hover:not([aria-pressed="true"]) { background: var(--gold-100); }
+.lab-range { display: flex; align-items: center; gap: .8rem; }
+.lab-range input[type=range] { accent-color: var(--gold-600); width: 180px; }
+.lab-range output { font-family: var(--font-caption); font-weight: 500; min-width: 6ch; color: var(--green-900); }
+.lab-switch { display: inline-flex; align-items: center; gap: .6rem; cursor: pointer; font-size: .92rem; user-select: none; }
+.lab-switch input { appearance: none; width: 42px; height: 24px; border-radius: 999px; background: var(--line); position: relative; transition: background .25s; cursor: pointer; }
+.lab-switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.2,.8,.2,1); box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.lab-switch input:checked { background: #b3412e; }
+.lab-switch input:checked::after { transform: translateX(18px); }
+
+.lab-stage { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0; align-items: stretch; }
+.lab-node { position: relative; background: var(--white); border: 1px solid var(--line); border-top: 3px solid var(--gold-500); border-radius: var(--radius-md); padding: 1.1rem 1.1rem 1rem; box-shadow: var(--shadow-card); transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s; z-index: 1; }
+.lab-node:hover { transform: translateY(-6px); }
+.lab-node.flag { border-top-color: #b3412e; animation: lab-shake .5s; }
+@keyframes lab-shake { 20%,60% { transform: translateX(-5px); } 40%,80% { transform: translateX(5px); } }
+.lab-node h3 { font-size: 1.05rem; margin: 0 0 .1rem; display: flex; align-items: center; gap: .5rem; }
+.lab-node h3 i { font-style: normal; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--green-900); color: var(--gold-400); font-size: .9rem; }
+.lab-node .role { font-family: var(--font-caption); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-500); display: block; margin-bottom: .8rem; }
+.lab-row { display: flex; justify-content: space-between; align-items: baseline; font-size: .93rem; padding: .22rem 0; border-bottom: 1px dashed var(--line); }
+.lab-row span:first-child { color: var(--ink-500); }
+.lab-row b { font-family: var(--font-caption); font-weight: 500; font-variant-numeric: tabular-nums; }
+.lab-row.net { border-bottom: 0; margin-top: .3rem; padding-top: .45rem; border-top: 2px solid var(--green-900); font-weight: 700; }
+.lab-row.net b { color: var(--green-900); font-size: 1.05rem; }
+.lab-row.itc b { color: var(--green-700); }
+.lab-row.itc.lost b { color: #b3412e; text-decoration: line-through; }
+
+.lab-link { position: relative; width: clamp(34px, 5vw, 64px); align-self: center; height: 56px; margin: 0 -2px; z-index: 0; }
+.lab-link::before { content: ""; position: absolute; left: 0; right: 0; top: 18px; height: 2px; background: repeating-linear-gradient(90deg, var(--gold-500) 0 6px, transparent 6px 12px); opacity: .6; }
+.lab-link::after { content: ""; position: absolute; left: 0; right: 0; top: 38px; height: 2px; background: repeating-linear-gradient(90deg, var(--green-600) 0 6px, transparent 6px 12px); opacity: .5; }
+.lab-link.broken::after { background: repeating-linear-gradient(90deg, #b3412e 0 3px, transparent 3px 12px); opacity: .9; }
+.coin { position: absolute; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; font: 700 .55rem var(--font-display); color: var(--green-950); }
+.coin.tax { top: 11px; left: 0; background: var(--gold-500); animation: coin-fwd 2.2s linear infinite; }
+.coin.itc { top: 31px; right: 0; background: var(--green-600); color: #fff; animation: coin-back 2.2s linear infinite; }
+.lab-link.broken .coin.itc { background: #b3412e; animation: coin-stall 1.6s ease-in-out infinite; }
+@keyframes coin-fwd { from { transform: translateX(0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } to { transform: translateX(calc(var(--lw, 50px) - 16px)); opacity: 0; } }
+@keyframes coin-back { from { transform: translateX(0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } to { transform: translateX(calc(var(--lw, 50px) * -1 + 16px)); opacity: 0; } }
+@keyframes coin-stall { 0%,100% { transform: translateX(0); opacity: 1; } 50% { transform: translateX(-8px); opacity: .4; } }
+
+.lab-bottom { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-top: 1.75rem; }
+.lab-card { background: var(--green-950); color: var(--cream-100); border-radius: var(--radius-md); padding: 1.4rem 1.6rem; position: relative; overflow: hidden; }
+.lab-card h4 { color: var(--gold-400); font-family: var(--font-caption); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 .8rem; font-weight: 500; }
+.lab-big { font-family: var(--font-display); font-size: clamp(1.8rem, 3.4vw, 2.6rem); color: var(--cream-50); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.lab-note { font-size: .92rem; color: rgba(244,233,201,.8); margin: .6rem 0 0; min-height: 2.8em; }
+.lab-note.warn { color: #ffb4a0; }
+.split-bar { display: flex; height: 38px; border-radius: var(--radius-sm); overflow: hidden; margin: .4rem 0 .7rem; background: rgba(255,255,255,.08); }
+.split-seg { display: grid; place-items: center; font: 500 .72rem var(--font-caption); letter-spacing: .06em; color: var(--green-950); white-space: nowrap; overflow: hidden; transition: flex-grow .7s cubic-bezier(.2,.8,.2,1), background .4s; }
+.split-seg.a { background: var(--gold-400); }
+.split-seg.b { background: var(--cream-100); }
+.split-seg.i { background: #7fd1ae; }
+.split-seg[hidden] { display: none; }
+.lab-legend { font-size: .88rem; color: rgba(244,233,201,.85); }
+.lab-foot { margin-top: 1.2rem; font-size: .8rem; color: var(--ink-500); font-style: italic; }
+
+@media (max-width: 860px) {
+  .lab-stage { grid-template-columns: 1fr; }
+  .lab-link { width: 56px; height: 54px; margin: 0 auto; transform: rotate(90deg); }
+  .lab-bottom { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) { .coin-top { width: 46px; height: 46px; left: .8rem; bottom: .8rem; } }
+@media (hover: none), (pointer: coarse) { .cursor-ring, .cursor-dot { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  
+  .coin, .coin-top span, .lab-node.flag { animation: none !important; }
+  .cursor-ring, .cursor-dot, .gst-net { display: none; }
+  .split-seg { transition: none; }
+}
+
+/* Let the page-out fade actually win over the entrance animation */
+body { animation-fill-mode: backwards; }
+
+.lab-group > label.lab-switch { font-family: var(--font-body); font-size: .95rem; letter-spacing: 0; text-transform: none; color: var(--ink-900); }

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post Editor — ADA Law Chambers Admin</title>
+<link rel="icon" href="../assets/images/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&family=Merriweather:wght@400;700&family=Lora:wght@400;600;700&family=PT+Serif:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Playfair+Display:wght@400;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css?v=3">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="../index.html" class="brand">
+      <img src="../assets/images/logo-header.webp" alt="ADA Law Chambers crest">
+      <span class="brand-text"><strong>ADA Law Chambers</strong><span>Admin Panel</span></span>
+    </a>
+    <nav class="admin-nav">
+      <a href="dashboard.html">Rules &amp; Thoughts</a>
+      <a href="editor.html" class="active">New Post</a>
+      <a href="articles.html">Articles</a>
+      <a href="links.html">Important Links</a>
+      <a href="resources.html">Resources</a>
+      <a href="messages.html">Messages</a>
+      <a href="applications.html">Applications</a>
+      <a href="../index.html">View Website</a>
+    </nav>
+    <div>
+      <p style="font-size:.78rem;color:rgba(244,233,201,.7);margin-bottom:.5rem;" id="admin-user-label"></p>
+      <button class="btn btn--outline btn--sm btn--full" data-logout>Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topline">
+      <h1 id="editor-heading" style="margin:0;font-size:1.6rem;">New Post</h1>
+      <a href="dashboard.html" class="btn btn--sm btn--outline-dark">&larr; Back to list</a>
+    </div>
+
+    <form class="admin-card" id="post-form">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="title">Title</label>
+          <input id="title" required placeholder="e.g. Understanding Reverse Charge Under GST">
+        </div>
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category">
+            <option value="rule">Rules</option>
+            <option value="thought">Thoughts</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="status">Status</label>
+          <select id="status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="cover_image">Cover Image URL</label>
+          <input id="cover_image" placeholder="https://&hellip; (leave blank to auto-generate a placeholder)">
+          <p class="form-note">Paste a URL, or upload a picture from your device below — an upload takes priority over the URL if both are set.</p>
+        </div>
+        <div class="field full">
+          <label for="cover_image_file">Or Upload a Picture</label>
+          <input id="cover_image_file" type="file" accept="image/jpeg,image/png,image/webp">
+          <img id="cover_image_preview" alt="Selected image preview" hidden style="margin-top:.75rem;max-width:280px;border-radius:6px;border:1px solid var(--line);">
+        </div>
+        <div class="field full">
+          <label for="excerpt">Excerpt (shown on listing cards)</label>
+          <textarea id="excerpt" style="min-height:70px;" required></textarea>
+        </div>
+        <div class="field full">
+          <label for="content">Full Content</label>
+          <div class="rte-toolbar" id="content-toolbar">
+            <div class="rte-font-picker" id="content-font-picker">
+              <button type="button" class="rte-font-trigger" id="content-font-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span id="content-font-trigger-label">Font</span>
+                <svg class="rte-caret" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <ul class="rte-font-menu" id="content-font-menu" role="listbox" hidden>
+                <li role="option" class="rte-font-option" data-value="Georgia, 'Times New Roman', serif" style="font-family:Georgia, 'Times New Roman', serif;">Georgia</li>
+                <li role="option" class="rte-font-option" data-value="'Times New Roman', Times, serif" style="font-family:'Times New Roman', Times, serif;">Times New Roman</li>
+                <li role="option" class="rte-font-option" data-value="'Playfair Display', Georgia, serif" style="font-family:'Playfair Display', Georgia, serif;">Playfair Display</li>
+                <li role="option" class="rte-font-option" data-value="Merriweather, Georgia, serif" style="font-family:Merriweather, Georgia, serif;">Merriweather</li>
+                <li role="option" class="rte-font-option" data-value="Lora, Georgia, serif" style="font-family:Lora, Georgia, serif;">Lora</li>
+                <li role="option" class="rte-font-option" data-value="'PT Serif', Georgia, serif" style="font-family:'PT Serif', Georgia, serif;">PT Serif</li>
+                <li role="option" class="rte-font-option" data-value="'Libre Baskerville', Georgia, serif" style="font-family:'Libre Baskerville', Georgia, serif;">Libre Baskerville</li>
+                <li role="option" class="rte-font-option" data-value="'Source Serif 4', Georgia, serif" style="font-family:'Source Serif 4', Georgia, serif;">Source Serif</li>
+                <li role="option" class="rte-font-option" data-value="Arial, Helvetica, sans-serif" style="font-family:Arial, Helvetica, sans-serif;">Arial</li>
+                <li role="option" class="rte-font-option" data-value="Helvetica, Arial, sans-serif" style="font-family:Helvetica, Arial, sans-serif;">Helvetica</li>
+                <li role="option" class="rte-font-option" data-value="Roboto, Arial, sans-serif" style="font-family:Roboto, Arial, sans-serif;">Roboto</li>
+                <li role="option" class="rte-font-option" data-value="'Open Sans', Arial, sans-serif" style="font-family:'Open Sans', Arial, sans-serif;">Open Sans</li>
+                <li role="option" class="rte-font-option" data-value="Lato, Arial, sans-serif" style="font-family:Lato, Arial, sans-serif;">Lato</li>
+                <li role="option" class="rte-font-option" data-value="Inter, Arial, sans-serif" style="font-family:Inter, Arial, sans-serif;">Inter</li>
+                <li role="option" class="rte-font-option" data-value="'IBM Plex Sans', Arial, sans-serif" style="font-family:'IBM Plex Sans', Arial, sans-serif;">IBM Plex Sans</li>
+              </ul>
+            </div>
+            <select class="rte-select rte-select--size" id="content-font-size" title="Font size">
+              <option value="">Size</option>
+              <option value="12px">12</option>
+              <option value="13px">13</option>
+              <option value="14px">14</option>
+              <option value="16px">16</option>
+              <option value="18px">18</option>
+              <option value="20px">20</option>
+              <option value="24px">24</option>
+              <option value="28px">28</option>
+              <option value="32px">32</option>
+              <option value="36px">36</option>
+              <option value="48px">48</option>
+            </select>
+            <span class="rte-sep"></span>
+            <button type="button" class="rte-btn" data-cmd="bold" title="Bold"><strong>B</strong></button>
+            <button type="button" class="rte-btn" data-cmd="italic" title="Italic"><em>I</em></button>
+            <span class="rte-sep"></span>
+            <button type="button" class="rte-btn rte-btn--wide" data-block="H1" title="Heading 1">H1</button>
+            <button type="button" class="rte-btn rte-btn--wide" data-block="H2" title="Heading 2">H2</button>
+            <button type="button" class="rte-btn rte-btn--wide" data-block="H3" title="Heading 3">H3</button>
+            <button type="button" class="rte-btn" data-block="P" title="Paragraph (remove heading)">&para;</button>
+          </div>
+          <div id="content" class="rte-editor" contenteditable="true" data-placeholder="Start writing… select text, then use the toolbar above to format it."></div>
+          <p class="form-note">Select some text first, then use the toolbar above — font, size, bold, italic, or a heading — just like a word processor.</p>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem;display:flex;gap:1rem;">
+        <button class="btn btn--gold" type="submit" id="save-btn">Save Post</button>
+        <a href="dashboard.html" class="btn btn--outline-dark">Cancel</a>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script src="../js/api-config.js"></script>
+<script src="../js/hostinger-client.js"></script>
+<script src="admin.js?v=4"></script>
+</body>
+</html>

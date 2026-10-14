@@ -1,0 +1,13 @@
+# Prevent direct browser access to config.php (it's only ever loaded
+# via require from the other PHP files in this folder, never visited
+# directly) and stop directory listing of this folder.
+<Files "config.php">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</Files>
+Options -Indexes
