@@ -187,6 +187,45 @@ landing page. Manage it entirely from **`/admin/links.html`** — add a
 title, URL, optional description, and a display order (lower numbers show
 first). No code edits required.
 
+### Magazines
+
+A public page, **`magazines.html`**, listed under the Insights dropdown, on
+the `insights.html` landing page and in the footer. The **Home page** also
+has a **Magazines** section (below the YouTube videos) showing the 3 newest
+published issues.
+
+Manage it from **`/admin/magazines.html`** → **Upload Magazine**: a title,
+optional issue/edition label (e.g. "October 2026"), optional description,
+the magazine **PDF** (max 50MB) and an optional **cover picture**
+(JPG/PNG/WEBP, max 4MB — without one the site shows a styled cover with
+the title). Save as Draft to hide it, Published to show it.
+
+Files are stored in `persistent-uploads/magazines/` (outside
+`public_html`, so redeploys never delete them) and served through
+`api/media.php`.
+
+If your database was created before this update, run this one block in
+phpMyAdmin:
+
+```sql
+CREATE TABLE IF NOT EXISTS magazines (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  title         VARCHAR(255) NOT NULL,
+  slug          VARCHAR(255) NOT NULL UNIQUE,
+  issue         VARCHAR(120),
+  description   TEXT,
+  file_url      VARCHAR(500) NOT NULL,
+  cover_image   VARCHAR(500),
+  status        ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
+  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_status_created (status, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+PHP's own upload limit must allow 50MB PDFs: in hPanel → **Advanced → PHP
+Configuration**, set `upload_max_filesize` and `post_max_size` to at least
+`64M`.
+
 ### WhatsApp notifications on form submit
 
 When the Contact form or either Careers form is submitted, the visitor's

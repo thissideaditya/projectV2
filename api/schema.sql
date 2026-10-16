@@ -95,9 +95,22 @@ CREATE TABLE IF NOT EXISTS resources (
   INDEX idx_category (category, subcategory, display_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS magazines (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  title         VARCHAR(255) NOT NULL,
+  slug          VARCHAR(255) NOT NULL UNIQUE,
+  issue         VARCHAR(120),
+  description   TEXT,
+  file_url      VARCHAR(500) NOT NULL,
+  cover_image   VARCHAR(500),
+  status        ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
+  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_status_created (status, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- NOTE: if your database already exists from an earlier deploy, you only
 -- need to run the CREATE TABLE blocks above that you don't already have
--- (e.g. just "articles" and "resources" if everything else already
+-- (e.g. just "magazines" if everything else already
 -- exists) — every statement here uses IF NOT EXISTS so it's safe either
 -- way to run the whole file again.
 

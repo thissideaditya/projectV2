@@ -1110,7 +1110,6 @@ body.disclaimer-active > *:not(.disclaimer-overlay) { filter: blur(6px); }
   display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px;
   border: 1px solid rgba(201, 162, 39, .45); box-shadow: 0 16px 30px -22px rgba(11, 33, 24, .6);
 }
-.tm-card--lead .tm-photo { padding-bottom: 0; }
 .tm-pill {
   position: absolute; left: 50%; bottom: 0; translate: -50% 0; white-space: nowrap;
   padding: .5rem 1.4rem; border-radius: 999px; background: #fffdf8; border: 1.5px solid var(--green-950);
@@ -1799,6 +1798,30 @@ body.disclaimer-active .floating-contact { display: none; }
 .feed-btn { display: inline-flex; align-items: center; gap: .8rem; padding: .95rem 2rem; }
 .feed-btn span { transition: transform .25s var(--ease); }
 .feed-btn:hover span { transform: translateX(4px); }
+
+/* ---- Magazines (home section + magazines.html) ----
+   Cards share .feed-card; covers are portrait. Issues uploaded without a
+   cover picture get .magazine-cover-ph (js/magazines-render.js). */
+.feed-section--magazines { background: radial-gradient(ellipse 60% 70% at 50% 20%, #fffdf7 0%, #f4ecda 60%, #ebe0c6 100%); }
+.feed-section--magazines .feed-deco-img { right: auto; left: 0; -webkit-mask-image: linear-gradient(90deg, #000 20%, transparent); mask-image: linear-gradient(90deg, #000 20%, transparent); opacity: .22; }
+.magazine-grid { max-width: 1040px; }
+.magazine-cover {
+  position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden;
+  background: var(--green-950); border-bottom: 1px solid rgba(201, 162, 39, .3);
+}
+.magazine-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+.feed-card:hover .magazine-cover img { transform: scale(1.04); }
+.magazine-cover-ph {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 1rem;
+  padding: 2rem 1.75rem; text-align: center; color: #f4e9c9;
+  background: radial-gradient(ellipse 90% 70% at 50% 15%, #2a5e47 0%, #123a2b 55%, #0b2118 100%);
+  box-shadow: inset 0 0 0 10px #0b2118, inset 0 0 0 11px rgba(230, 201, 110, .55);
+}
+.magazine-cover-brand { font-family: var(--font-caption); font-size: .66rem; letter-spacing: .26em; text-transform: uppercase; color: var(--gold-400); }
+.magazine-cover-ph strong { font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 1.8rem); line-height: 1.2; font-weight: 600; }
+.magazine-cover-issue { align-self: center; padding-top: .8rem; border-top: 1px solid rgba(230, 201, 110, .5); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-400); }
+.magazine-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-bottom: .25rem; }
+.feed-section--magazines .empty-state { max-width: 640px; margin: 0 auto; background: rgba(255, 253, 248, .7); }
 
 .video-play { /* round gold-ringed play button, centred on the thumbnail */
   position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; translate: -50% -50%; border-radius: 50%;

@@ -241,6 +241,56 @@
       await request("/resources.php?id=" + encodeURIComponent(id), { method: "DELETE" });
       return true;
     },
+
+    // ---------------------------------------------------------------
+    // Magazines (uploaded PDF issues + cover images)
+    // ---------------------------------------------------------------
+    /** Published magazines, newest first; pass a limit (e.g. 3) for just the latest few. */
+    async fetchMagazines(limit) {
+      var body = await request("/magazines.php" + (limit ? "?limit=" + encodeURIComponent(limit) : ""));
+      return body.magazines || [];
+    },
+
+    async fetchAllMagazines() {
+      var body = await request("/magazines.php?all=1");
+      return body.magazines || [];
+    },
+
+    async fetchMagazineById(id) {
+      var body = await request("/magazines.php?all=1&id=" + encodeURIComponent(id));
+      return body.magazine || null;
+    },
+
+    async createMagazine(magazine) {
+      var body = await request("/magazines.php", {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify(magazine),
+      });
+      return body.magazine;
+    },
+
+    async updateMagazine(id, updates) {
+      var body = await request("/magazines.php?id=" + encodeURIComponent(id), {
+        method: "PUT",
+        headers: jsonHeaders(),
+        body: JSON.stringify(updates),
+      });
+      return body.magazine;
+    },
+
+    async deleteMagazine(id) {
+      await request("/magazines.php?id=" + encodeURIComponent(id), { method: "DELETE" });
+      return true;
+    },
+
+    /** Upload a magazine's PDF ("file") or cover image ("cover") and get back its URL. */
+    async uploadMagazineFile(file, field) {
+      var formData = new FormData();
+      formData.append(field || "file", file);
+      var body = await request("/upload-magazine.php", { method: "POST", body: formData });
+      return body.url;
+    },
   };
 
   global.ADA = global.ADA || {};

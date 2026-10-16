@@ -313,6 +313,30 @@
   </div>
 </section>
 
+<!-- ============ MAGAZINES (uploaded from admin/magazines.html) ============ -->
+<section class="section feed-section feed-section--magazines" id="latest-magazines" data-dot="Magazines">
+  <div class="feed-deco" aria-hidden="true">
+    <img class="feed-deco-img" src="assets/images/people/people-column.webp" alt="">
+    <ul class="feed-words feed-words--left"><li>Read</li><li>the latest</li><li>issue</li></ul>
+    <ul class="feed-words feed-words--right"><li>GST</li><li>Tax</li><li>Litigation</li><li>Policy</li></ul>
+  </div>
+  <div class="container">
+    <div class="section-head section-head--center">
+      <span class="eyebrow">Magazines</span>
+      <h2 class="section-title">Latest magazines</h2>
+      <div class="divider-gold"></div>
+      <p class="lede">Our latest magazine issues, free to read and download.</p>
+    </div>
+    <!-- js/magazines-render.js fills this with the 3 newest published issues -->
+    <div id="home-magazines" aria-busy="true">
+      <div class="empty-state">Loading&hellip;</div>
+    </div>
+    <div class="text-center feed-cta">
+      <a href="magazines.html" class="btn btn--outline-dark feed-btn">View All Magazines <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
 <!-- ============ CTA BAND ============ -->
 <div data-gst-lab data-dot="GST Flow"></div>
 
@@ -330,6 +354,9 @@
 <script src="js/api-config.js"></script>
 <script src="js/partials.js"></script>
 <script src="js/home-feeds.js"></script>
+<script src="js/hostinger-client.js"></script>
+<script src="js/share.js?v=1"></script>
+<script src="js/magazines-render.js?v=1"></script>
 <script src="js/main.js"></script>
 <script src="js/motion.js"></script>
 <script src="js/motion-plus.js"></script>

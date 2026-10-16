@@ -51,7 +51,7 @@ define('UPLOAD_URL_BASE', '/uploads');
 // $_SERVER['DOCUMENT_ROOT'] is public_html's real server path;
 // dirname() of that is the folder directly above it.
 define('PERSIST_DIR', dirname($_SERVER['DOCUMENT_ROOT']) . '/persistent-uploads');
-foreach (['articles', 'resources', 'posts', 'resumes'] as $__sub) {
+foreach (['articles', 'resources', 'posts', 'resumes', 'magazines'] as $__sub) {
     $__path = PERSIST_DIR . '/' . $__sub;
     if (!is_dir($__path)) {
         mkdir($__path, 0755, true);
@@ -94,6 +94,15 @@ define('ARTICLE_ALLOWED_MIME', [
     'application/octet-stream',
 ]);
 define('ARTICLE_MAX_BYTES', 20 * 1024 * 1024); // 20MB
+
+// Magazines — the issue itself is a PDF; its cover is an optional image
+// (JPG/PNG/WEBP, same rules as IMAGE_* above). Magazine PDFs run larger
+// than articles, so the limit is higher — PHP's own upload_max_filesize
+// and post_max_size (hPanel → Advanced → PHP Configuration) must be at
+// least this big too, or the upload fails before reaching this code.
+define('MAGAZINE_ALLOWED_EXT', ['pdf']);
+define('MAGAZINE_ALLOWED_MIME', ['application/pdf']);
+define('MAGAZINE_MAX_BYTES', 50 * 1024 * 1024); // 50MB
 
 session_start();
 

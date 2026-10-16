@@ -798,6 +798,166 @@
     });
   }
 
+  /* -------------------------------------------------------------
+     MAGAZINES (admin/magazines.html) — list, mirrors the articles list
+  ------------------------------------------------------------- */
+  function initMagazinesList() {
+    var table = document.getElementById("magazines-table-body");
+    if (!table) return;
+
+    requireAuth().then(function (session) {
+      if (session) loadMagazines();
+    });
+
+    async function loadMagazines() {
+      table.innerHTML = '<tr><td colspan="5">Loading&hellip;</td></tr>';
+      try {
+        var magazines = await window.ADA.data.fetchAllMagazines();
+        if (!magazines.length) {
+          table.innerHTML = '<tr><td colspan="5">No magazines yet. <a href="magazine-editor.html">Upload one</a>.</td></tr>';
+          return;
+        }
+        table.innerHTML = magazines.map(function (m) {
+          return (
+            "<tr>" +
+              "<td>" + escapeHtml(m.title) + "</td>" +
+              "<td>" + escapeHtml(m.issue || "—") + "</td>" +
+              "<td>" + escapeHtml(new Date(String(m.created_at).replace(" ", "T")).toLocaleDateString("en-IN")) + "</td>" +
+              "<td>" + (m.status === "published"
+                ? '<span class="badge badge--gold">Published</span>'
+                : '<span class="badge">Draft</span>') + "</td>" +
+              "<td style=\"white-space:nowrap;\">" +
+                "<a class=\"btn btn--sm btn--outline-dark\" href=\"" + escapeHtml(m.file_url) + "\" target=\"_blank\" rel=\"noopener\">View</a> " +
+                "<a class=\"btn btn--sm btn--outline-dark\" href=\"magazine-editor.html?id=" + m.id + "\">Edit</a> " +
+                "<button class=\"btn btn--sm btn--danger\" data-delete=\"" + m.id + "\">Delete</button>" +
+              "</td>" +
+            "</tr>"
+          );
+        }).join("");
+
+        table.querySelectorAll("[data-delete]").forEach(function (btn) {
+          btn.addEventListener("click", async function () {
+            if (!confirm("Delete this magazine?")) return;
+            await window.ADA.data.deleteMagazine(btn.getAttribute("data-delete"));
+            loadMagazines();
+          });
+        });
+      } catch (err) {
+        table.innerHTML = '<tr><td colspan="5">Could not load magazines.</td></tr>';
+        console.error(err);
+      }
+    }
+  }
+
+  /* -------------------------------------------------------------
+     MAGAZINE EDITOR (admin/magazine-editor.html) — create or update
+  ------------------------------------------------------------- */
+  function initMagazineEditor() {
+    var form = document.getElementById("magazine-form");
+    if (!form) return;
+
+    var params = new URLSearchParams(window.location.search);
+    var editId = params.get("id");
+    var heading = document.getElementById("magazine-editor-heading");
+
+    var fileInput = document.getElementById("magazine-file");
+    var fileLabel = document.getElementById("magazine-file-label");
+    var coverInput = document.getElementById("magazine-cover");
+    var coverPreview = document.getElementById("magazine-cover-preview");
+    var existingFileUrl = null;
+    var existingCover = "";
+
+    requireAuth().then(async function (session) {
+      if (!session) return;
+      if (editId) {
+        heading.textContent = "Edit Magazine";
+        var magazine = await window.ADA.data.fetchMagazineById(editId);
+        if (magazine) {
+          document.getElementById("magazine-title").value = magazine.title || "";
+          document.getElementById("magazine-issue").value = magazine.issue || "";
+          document.getElementById("magazine-description").value = magazine.description || "";
+          document.getElementById("magazine-status").value = magazine.status || "draft";
+          existingFileUrl = magazine.file_url || null;
+          existingCover = magazine.cover_image || "";
+          if (existingFileUrl) {
+            fileLabel.textContent = "Current PDF uploaded (choose a new file only to replace it)";
+          }
+          if (existingCover) {
+            coverPreview.src = existingCover;
+            coverPreview.hidden = false;
+          }
+        }
+      } else {
+        heading.textContent = "Upload Magazine";
+      }
+    });
+
+    fileInput.addEventListener("change", function () {
+      var file = fileInput.files && fileInput.files[0];
+      fileLabel.textContent = file ? file.name : "No file chosen";
+    });
+
+    coverInput.addEventListener("change", function () {
+      var file = coverInput.files && coverInput.files[0];
+      if (!file) {
+        coverPreview.hidden = !existingCover;
+        if (existingCover) coverPreview.src = existingCover;
+        return;
+      }
+      coverPreview.src = URL.createObjectURL(file);
+      coverPreview.hidden = false;
+    });
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var saveBtn = document.getElementById("magazine-save-btn");
+
+      var selectedFile = fileInput.files && fileInput.files[0];
+      var selectedCover = coverInput.files && coverInput.files[0];
+      if (!selectedFile && !existingFileUrl) {
+        alert("Please choose the magazine PDF to upload.");
+        return;
+      }
+
+      saveBtn.disabled = true;
+
+      try {
+        var fileUrl = existingFileUrl;
+        var coverImage = existingCover;
+
+        if (selectedFile) {
+          saveBtn.textContent = "Uploading PDF…";
+          fileUrl = await window.ADA.data.uploadMagazineFile(selectedFile, "file");
+        }
+        if (selectedCover) {
+          saveBtn.textContent = "Uploading cover…";
+          coverImage = await window.ADA.data.uploadMagazineFile(selectedCover, "cover");
+        }
+
+        var payload = {
+          title: document.getElementById("magazine-title").value.trim(),
+          issue: document.getElementById("magazine-issue").value.trim(),
+          description: document.getElementById("magazine-description").value.trim(),
+          file_url: fileUrl,
+          cover_image: coverImage,
+          status: document.getElementById("magazine-status").value,
+        };
+
+        saveBtn.textContent = "Saving…";
+        if (editId) {
+          await window.ADA.data.updateMagazine(editId, payload);
+        } else {
+          await window.ADA.data.createMagazine(payload);
+        }
+        window.location.href = "magazines.html";
+      } catch (err) {
+        alert("Could not save magazine: " + err.message);
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save Magazine";
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initLoginPage();
     initDashboard();
@@ -808,6 +968,8 @@
     initResources();
     initArticlesList();
     initArticleEditor();
+    initMagazinesList();
+    initMagazineEditor();
     initLogout();
   });
 })();

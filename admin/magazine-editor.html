@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magazine Editor — ADA Law Chambers Admin</title>
+<link rel="icon" href="../assets/images/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="../index.html" class="brand">
+      <img src="../assets/images/logo-header.webp" alt="ADA Law Chambers crest">
+      <span class="brand-text"><strong>ADA Law Chambers</strong><span>Admin Panel</span></span>
+    </a>
+    <nav class="admin-nav">
+      <a href="dashboard.html">Rules &amp; Thoughts</a>
+      <a href="editor.html">New Post</a>
+      <a href="articles.html">Articles</a>
+      <a href="magazines.html" class="active">Magazines</a>
+      <a href="links.html">Important Links</a>
+      <a href="resources.html">Resources</a>
+      <a href="messages.html">Messages</a>
+      <a href="applications.html">Applications</a>
+      <a href="../index.html">View Website</a>
+    </nav>
+    <div>
+      <p style="font-size:.78rem;color:rgba(244,233,201,.7);margin-bottom:.5rem;" id="admin-user-label"></p>
+      <button class="btn btn--outline btn--sm btn--full" data-logout>Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topline">
+      <div>
+        <h1 style="margin-bottom:.2rem;font-size:1.6rem;" id="magazine-editor-heading">Upload Magazine</h1>
+        <p style="margin:0;color:var(--ink-500);font-size:.9rem;">Upload a magazine issue as a PDF, with an optional cover picture.</p>
+      </div>
+    </div>
+
+    <form class="admin-card" id="magazine-form">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="magazine-title">Title</label>
+          <input id="magazine-title" required placeholder="e.g. ADA Tax Digest">
+        </div>
+        <div class="field">
+          <label for="magazine-issue">Issue / Edition (optional)</label>
+          <input id="magazine-issue" placeholder="e.g. October 2026 &middot; Vol. 3">
+        </div>
+        <div class="field">
+          <label for="magazine-status">Status</label>
+          <select id="magazine-status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="magazine-description">Description (optional)</label>
+          <textarea id="magazine-description" style="min-height:100px;" placeholder="A line or two on what this issue covers."></textarea>
+        </div>
+        <div class="field full">
+          <label for="magazine-file">Magazine PDF (max 50MB)</label>
+          <input id="magazine-file" type="file" accept=".pdf,application/pdf">
+          <p class="form-note" id="magazine-file-label">No file chosen</p>
+        </div>
+        <div class="field full">
+          <label for="magazine-cover">Cover Picture (optional &mdash; JPG, PNG or WEBP, max 4MB)</label>
+          <input id="magazine-cover" type="file" accept="image/jpeg,image/png,image/webp">
+          <p class="form-note" id="magazine-cover-label">Without a cover, the site shows a styled placeholder with the title.</p>
+          <img id="magazine-cover-preview" alt="Cover preview" hidden style="margin-top:.75rem;max-width:200px;border-radius:6px;border:1px solid var(--line);">
+        </div>
+      </div>
+      <div style="margin-top:1.25rem;">
+        <button class="btn btn--gold" type="submit" id="magazine-save-btn">Save Magazine</button>
+        <a href="magazines.html" class="btn btn--outline-dark">Cancel</a>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script src="../js/api-config.js"></script>
+<script src="../js/hostinger-client.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
