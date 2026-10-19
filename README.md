@@ -28,7 +28,6 @@ ada-law-Chambers/
 ├── api/                           PHP backend — see "Deploying to Hostinger" below
 │   ├── config.php                  Database credentials (EDIT THIS)
 │   ├── schema.sql                  MySQL tables — run once in phpMyAdmin
-│   ├── setup-admin.php             One-time script to create your admin login
 │   ├── auth.php                    Login / logout / session check
 │   ├── posts.php                   Rules & Thoughts CRUD
 │   ├── upload-image.php            Admin picture upload for post covers
@@ -125,7 +124,12 @@ PHP so resumes and post images can be saved there.
 ### 6. Create your admin login
 
 Passwords must be hashed by PHP — you can't just type one into
-phpMyAdmin — so there's a one-time setup script for this:
+phpMyAdmin — so there's a one-time setup script for this. It has been
+**removed from the project** now that the admin login exists (a live copy
+could create or reset admin logins). If you ever need it again (new
+database, forgotten password), restore it temporarily with
+`git checkout 947a346 -- api/setup-admin.php`, deploy, use it once as
+below, then delete it again.
 
 1. In your browser, visit:
    ```
@@ -294,8 +298,8 @@ This pre-filled-message approach is the practical, free equivalent.
   stored or compared in plain text.
 - Resume downloads require an active admin session (`api/download-resume.php`)
   rather than being plain public links.
-- Delete `api/setup-admin.php` after first use (Step 6) — this is the
-  single most important thing to remember post-deployment.
+- `api/setup-admin.php` is no longer in the project. If you restore it
+  for a reset (Step 6), delete it again right after use.
 
 ---
 

@@ -120,5 +120,6 @@ CREATE TABLE IF NOT EXISTS magazines (
 
 -- NOTE: no admin row is created here on purpose — passwords must be
 -- hashed by PHP (password_hash), not pasted in as plain text via SQL.
--- Create your admin login by visiting api/setup-admin.php once after
--- deploying (see README.md for the full step-by-step).
+-- The admin login is created with the one-time api/setup-admin.php
+-- script, which has been removed from the project now that it was used
+-- (see README.md, Step 6, for restoring it if ever needed).
