@@ -33,7 +33,11 @@
     ".share-btn{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--line);color:var(--green-800);border-radius:999px;padding:.4em .9em;font-size:.8rem;font-weight:600;line-height:1.2}" +
     ".share-btn:hover,.share-btn[aria-expanded=true]{border-color:var(--gold-500);color:var(--gold-700)}" +
     ".share-btn svg{width:1em;height:1em;flex:none}" +
-    ".share-menu{position:fixed;z-index:700;min-width:12rem;background:var(--white);border:1px solid var(--line);border-radius:var(--radius-md);box-shadow:0 18px 40px -16px rgba(0,0,0,.35);padding:.35rem}" +
+    // While the menu is open, an invisible layer covers the page beneath it, so
+    // nothing below reacts to hover or clicks; the first click anywhere just closes it.
+    ".share-backdrop{position:fixed;inset:0;z-index:950;background:transparent}" +
+    ".share-backdrop[hidden]{display:none}" +
+    ".share-menu{position:fixed;z-index:960;min-width:12rem;background:var(--white);border:1px solid var(--line);border-radius:var(--radius-md);box-shadow:0 18px 40px -16px rgba(0,0,0,.35);padding:.35rem}" +
     ".share-menu[hidden]{display:none}" +
     ".share-menu a,.share-menu button{display:flex;align-items:center;gap:.7rem;width:100%;padding:.7rem .8rem;background:none;border:0;border-radius:6px;font-size:.92rem;color:var(--ink-700);text-align:left;text-decoration:none;cursor:pointer}" +
     ".share-menu a:hover,.share-menu button:hover{background:var(--cream-100)}" +
@@ -63,6 +67,7 @@
 
   /* ---------- the menu (built once, reused) ---------- */
   var menu = null;
+  var backdrop = null;
   var activeBtn = null;
   var copyLabel = null;
 
@@ -77,6 +82,11 @@
       '<a role="menuitem" data-act="mail">' + ICON_MAIL + '<span>Email</span></a>';
     document.body.appendChild(menu);
     copyLabel = menu.querySelector('[data-act="copy"] span');
+
+    backdrop = document.createElement("div");
+    backdrop.className = "share-backdrop";
+    backdrop.hidden = true;
+    document.body.appendChild(backdrop);
   }
 
   function copyText(text) {
@@ -100,6 +110,7 @@
   function closeMenu() {
     if (!menu || menu.hidden) return;
     menu.hidden = true;
+    backdrop.hidden = true;
     if (activeBtn) activeBtn.setAttribute("aria-expanded", "false");
     activeBtn = null;
     copyLabel.textContent = "Copy link";
@@ -120,6 +131,7 @@
 
     copyLabel.textContent = "Copy link";
     menu.hidden = false;
+    backdrop.hidden = false;
     btn.setAttribute("aria-expanded", "true");
     activeBtn = btn;
 
