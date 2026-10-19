@@ -92,13 +92,23 @@ ErrorDocument 404 /404.html
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  # Content-Security-Policy: browsers only run this site's own script files
+  # plus the one-line inline script at the top of each page (allowed by its
+  # sha256 hash). An injected <script>, onclick=... or javascript: link is
+  # refused even if it ever got into a page. Fonts/icons may come from
+  # Google Fonts and jsdelivr; images from any https site (article and
+  # video thumbnails); the only frame allowed is the Google Map on Contact.
+  # IF YOU EDIT that inline <script> line in the pages, its hash changes and
+  # this must be updated (or the line stops running). Adding Google
+  # Analytics later also needs its domains added here.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-tOwFmpL101+EeXidaUvOWXWwJQ0kmijcvzHL9oNaJGk='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self'; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
   Header always unset X-Powered-By
   Header unset X-Powered-By
 </IfModule>
 
-# Project notes and database scripts (README.md, api/schema.sql, ...)
-# are for the developer, not website visitors.
-<FilesMatch "\.(md|sql)$">
+# Project notes, database scripts, logs and backups are for the developer,
+# not website visitors.
+<FilesMatch "\.(md|sql|log|bak|old|orig|swp|zip|tar|gz|env|ini|lock|json\.dist)$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
@@ -107,3 +117,19 @@ ErrorDocument 404 /404.html
     Deny from all
   </IfModule>
 </FilesMatch>
+
+# Hidden files (.DS_Store, .git, .env, .htaccess, ...) are never served.
+# (.well-known/ is a folder, so Hostinger's SSL renewal is unaffected.)
+<FilesMatch "^\.">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+RedirectMatch 404 /\.git(/|$)
+
+# No folder listings anywhere on the site.
+Options -Indexes

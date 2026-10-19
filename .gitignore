@@ -1,0 +1,12 @@
+# macOS folder files (they list file names; never deploy them)
+.DS_Store
+
+# Local environment / secrets files, if ever added
+.env
+.env.*
+*.local.php
+
+# Logs and editor leftovers
+*.log
+*.swp
+*~

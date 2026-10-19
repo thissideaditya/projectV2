@@ -13,7 +13,8 @@
  *   - the visitor gets their reply first (the email is sent after).
  *
  * ONE-TIME ACTIVATION: the very first submission makes FormSubmit
- * send a confirmation email to NOTIFY_EMAIL. Click "Activate" in it;
+ * send a confirmation email to the receiving address. Click "Activate"
+ * in it (once per address: CONTACT_NOTIFY_EMAIL and NOTIFY_EMAIL);
  * from then on every submission arrives as an email. (That first
  * submission is still saved in the admin panel.)
  *
@@ -26,7 +27,10 @@
  * ---------------------------------------------------------------
  */
 
+// Where submissions are emailed: Contact Us -> CONTACT_NOTIFY_EMAIL,
+// everything else (Careers) -> NOTIFY_EMAIL.
 const NOTIFY_EMAIL = 'info@ada.org.in';
+const CONTACT_NOTIFY_EMAIL = 'hello@adalawchambers.com';
 const FORMSUBMIT_AJAX_URL = 'https://formsubmit.co/ajax/';
 const SITE_URL = 'https://www.adalawchambers.com';
 
@@ -36,7 +40,7 @@ const SITE_URL = 'https://www.adalawchambers.com';
  * Reply-To, so "Reply" in the inbox answers the visitor directly.
  * Never throws; failures are logged (see notify_log()).
  */
-function send_form_email(string $subject, array $fields, string $replyTo, string $fromPage): bool
+function send_form_email(string $subject, array $fields, string $replyTo, string $fromPage, string $to = NOTIFY_EMAIL): bool
 {
     $payload = $fields + [
         '_subject'  => $subject,
@@ -48,7 +52,7 @@ function send_form_email(string $subject, array $fields, string $replyTo, string
         $payload['_replyto'] = $replyTo;
     }
 
-    $url = FORMSUBMIT_AJAX_URL . rawurlencode(NOTIFY_EMAIL);
+    $url = FORMSUBMIT_AJAX_URL . rawurlencode($to);
     // FormSubmit sits behind Cloudflare, which may refuse requests with no
     // User-Agent (PHP's curl sends none by default), so name ourselves.
     $userAgent = 'Mozilla/5.0 (compatible; ADA-Law-Chambers-Website/1.0; +' . SITE_URL . ')';

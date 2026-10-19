@@ -14,7 +14,7 @@
    Requires js/api-config.js to be loaded first.
 =================================================================== */
 
-var CONTACT_RECEIVING_EMAIL = "info@ada.org.in";
+var CONTACT_RECEIVING_EMAIL = "hello@adalawChambers.com";
 
 (function () {
   "use strict";

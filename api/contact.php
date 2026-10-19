@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------
  * POST (JSON body): { name, email, phone, message }
  * Stores the message in contact_messages (admin panel → Messages) and
- * emails it to the Chambers (see api/notify.php).
+ * emails it to hello@adalawchambers.com (see api/notify.php).
  * ---------------------------------------------------------------
  */
 
@@ -57,5 +57,5 @@ json_ok_then(['message' => 'Thank you — your message has been received.'], 201
         'Phone'   => $phone ?: '—',
         'Message' => $message,
         'Sent from' => SITE_URL . '/contact.html',
-    ], $email, 'contact.html');
+    ], $email, 'contact.html', CONTACT_NOTIFY_EMAIL);
 });

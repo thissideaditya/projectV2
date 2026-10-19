@@ -44,7 +44,7 @@ function site_safe_url($url): string
     $u = trim((string) $url);
     $probe = preg_replace('~[\x00-\x20]+~', '', $u);
     if (preg_match('~^(https?:|mailto:|tel:)~i', $probe)) return $u;
-    if (strpos($probe, ':') === false && preg_match('~^(/(?!/)|\.{1,2}/|[\w\-.~%]+(/|\?|#|$))~', $probe)) return $u;
+    if (strpos($probe, ':') === false && preg_match('@^(/(?!/)|\.{1,2}/|[\w\-.~%]+(/|\?|#|$))@', $probe)) return $u;
     return '#';
 }
 
