@@ -1268,7 +1268,17 @@ body.disclaimer-active > *:not(.disclaimer-overlay) { filter: blur(6px); }
   width: 240px; background: var(--green-950); color: var(--gold-100); flex-shrink: 0;
   padding: 1.75rem 1.25rem; display: flex; flex-direction: column;
 }
-.admin-sidebar .brand-text strong { color: var(--cream-50); }
+/* Sidebar brand: the public header's .brand is sized for a 144px logo and a
+   one-line name — too wide for this 240px column (the logo collapsed to
+   nothing and the name was cut off). Small cream badge + wrapping name. */
+.admin-sidebar .brand { gap: .75rem; min-width: 0; }
+.admin-sidebar .brand img {
+  flex: none; width: 52px; height: 52px; padding: 3px; object-fit: contain;
+  background: var(--cream-50); border: 2px solid rgba(230, 201, 110, .6);
+}
+.admin-sidebar .brand-text { min-width: 0; white-space: normal; }
+.admin-sidebar .brand-text strong { color: var(--cream-50); font-size: 1.05rem; line-height: 1.2; white-space: normal; }
+.admin-sidebar .brand-text span { margin-top: .25rem; color: var(--gold-400); white-space: normal; }
 .admin-nav { margin-top: 2.5rem; flex: 1; }
 .admin-nav a { display: block; padding: .7rem .8rem; border-radius: var(--radius-sm); font-size: .88rem; margin-bottom: .3rem; color: rgba(244,233,201,.85); }
 .admin-nav a:hover, .admin-nav a.active { background: rgba(201,162,39,.16); color: var(--gold-400); }
@@ -1284,7 +1294,11 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
 .status-pill.draft { background: var(--cream-100); color: var(--gold-700); }
 .login-shell { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--green-950); padding: 1.5rem; }
 .login-card { width: 100%; max-width: 380px; background: var(--cream-50); border-radius: var(--radius-md); padding: 2.5rem; box-shadow: var(--shadow-card); }
-.login-card .brand { margin-bottom: 1.75rem; }
+.login-card .brand { margin-bottom: 1.75rem; gap: .85rem; min-width: 0; }
+/* Same fix as the admin sidebar: a fixed-size logo that can't be squeezed,
+   and a name that may wrap inside the 300px card. */
+.login-card .brand img { flex: none; width: 64px; height: 64px; object-fit: contain; }
+.login-card .brand-text, .login-card .brand-text strong { min-width: 0; white-space: normal; }
 .alert { padding: .8rem 1rem; border-radius: var(--radius-sm); font-size: .85rem; margin-bottom: 1.2rem; }
 .alert.error { background: #fbe6e6; color: #7a2323; }
 .alert.info { background: var(--cream-100); color: var(--gold-700); }
@@ -1385,9 +1399,21 @@ body.disclaimer-active .floating-contact { display: none; }
   .bio-block img { max-width: 220px; }
   .footer-top { grid-template-columns: 1fr; }
   .admin-shell { flex-direction: column; }
-  .admin-sidebar { width: 100%; flex-direction: row; align-items: center; padding: 1rem 1.25rem; }
-  .admin-nav { display: flex; gap: .4rem; margin-top: 0; }
-  .admin-main { padding: 1.5rem; }
+  /* Phone: brand + Sign Out on top, the menu as a swipeable strip below it
+     (11 links can't fit in one row; they used to push the page sideways). */
+  .admin-sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: .9rem 1rem; padding: 1rem 1.25rem .75rem; }
+  .admin-sidebar .brand img { width: 44px; height: 44px; }
+  .admin-sidebar .brand-text strong { font-size: .95rem; }
+  .admin-sidebar > div:last-child { margin-left: auto; }
+  .admin-sidebar > div:last-child p { display: none; } /* signed-in email: no room on phones */
+  .admin-sidebar > div:last-child .btn--full { width: auto; }
+  .admin-nav {
+    order: 3; flex: 0 0 100%; display: flex; gap: .4rem; margin: 0 -1.25rem; padding: 0 1.25rem .25rem;
+    overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .admin-nav::-webkit-scrollbar { display: none; }
+  .admin-nav a { flex: none; white-space: nowrap; margin-bottom: 0; padding: .55rem .8rem; }
+  .admin-main { padding: 1.5rem; min-width: 0; }
   .card--featured { flex-direction: column; align-items: flex-start; text-align: left; }
   .card-head { flex-wrap: wrap; }
   .card--featured .badge-gold { margin-left: 0; margin-top: .4rem; display: inline-block; }
@@ -2028,8 +2054,9 @@ body.disclaimer-active .section-dots { display: none; }
   .main-nav a { font-size: .92rem; }
 }
 @media (min-width: 761px) and (max-width: 1100px) {
-  .brand-text, .header-social { display: none; }   /* crest alone; social links stay in the footer */
-  .brand img { height: 5rem; width: 5rem; }
+  /* Public header only — the admin sidebar and login card keep their name. */
+  .site-header .brand-text, .header-social { display: none; }   /* crest alone; social links stay in the footer */
+  .site-header .brand img { height: 5rem; width: 5rem; }
 }
 
 /* Loading placeholders for the YouTube cards (replaced by js/home-feeds.js) */
