@@ -1112,8 +1112,8 @@ body.disclaimer-active > *:not(.disclaimer-overlay) { filter: blur(6px); }
 }
 .tm-pill {
   position: absolute; left: 50%; bottom: 0; translate: -50% 0; white-space: nowrap;
-  padding: .5rem 1.4rem; border-radius: 999px; background: #fffdf8; border: 1.5px solid var(--green-950);
-  font-family: "Inter", sans-serif; font-size: .74rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--green-950);
+  padding: .5rem 1.4rem; border-radius: 999px; background: #fffdf8; border: 1.5px solid var(--gold-700);
+  font-family: "Inter", sans-serif; font-size: .74rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-700); /* same gold as .tm-role */
   box-shadow: 0 8px 18px -12px rgba(11, 33, 24, .6);
 }
 .tm-body { padding-top: .4rem; }
