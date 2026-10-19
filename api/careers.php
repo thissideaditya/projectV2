@@ -81,7 +81,10 @@ if (!empty($_FILES['resume']) && $_FILES['resume']['error'] !== UPLOAD_ERR_NO_FI
         json_error(400, 'Resume file does not look like a valid PDF or DOCX.');
     }
 
-    $dir = UPLOAD_DIR . '/resumes';
+    // PERSIST_DIR is outside public_html: survives redeploys, and has no
+    // public URL — resumes are only served by the admin-only
+    // api/download-resume.php.
+    $dir = PERSIST_DIR . '/resumes';
     if (!is_dir($dir)) {
         mkdir($dir, 0755, true);
     }

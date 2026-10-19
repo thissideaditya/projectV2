@@ -99,6 +99,10 @@
       var r = state.rate / 100, P = state.price;
       var v = stages.map(function (s) { return P * s.mult; });
       var tax = v.map(function (x) { return x * r; });
+      // The consumer pays the retailer's price PLUS the GST on it, and that
+      // GST (the retailer's tax) is what's "included" in what they pay.
+      v[3] = v[2] + tax[2];
+      tax[3] = tax[2];
       var itc = [0, tax[0], tax[1], 0];
       if (state.deny) itc[1] = 0;           // wholesaler's credit denied
       var net = [tax[0] - itc[0], tax[1] - itc[1], tax[2] - itc[2]];

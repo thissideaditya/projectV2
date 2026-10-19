@@ -257,6 +257,16 @@ function site_render_posts(string $html, string $category): string
     return site_fill_mount($html, 'post-listing', implode('', array_map('site_post_card', $posts)), 'grid post-grid');
 }
 
+/**
+ * Post bodies come from the rich-text editor. The page's only H1 is the
+ * post title, so any H1 inside the body (older posts) is shown as an H2.
+ * Same rule as postBodyHtml() in js/posts-render.js.
+ */
+function site_post_body(string $html): string
+{
+    return preg_replace('~<(/?)h1(?=[\s>])~i', '<$1h2', $html);
+}
+
 // ---- Articles (js/articles-render.js) ----------------------------------
 
 function site_article_card(array $a): string

@@ -126,19 +126,24 @@ if ($method === 'PUT') {
             $values[] = $body[$col];
         }
     }
-    if (array_key_exists('title', $body) && !array_key_exists('slug', $body)) {
-        $fields[] = 'slug = ?';
-        $values[] = slugify($body['title']);
-    } elseif (array_key_exists('slug', $body)) {
-        $fields[] = 'slug = ?';
-        $values[] = slugify($body['slug']);
-    }
+    // The slug is the post's address (post.php?slug=...). It is set once, when
+    // the post is created, and NOT changed when the title is edited — links
+    // already shared or indexed by Google must keep working.
 
     if (!$fields) json_error(400, 'No fields to update.');
+
+    $stmt = $pdo->prepare('SELECT cover_image FROM posts WHERE id = ?');
+    $stmt->execute([$id]);
+    $old = $stmt->fetch();
 
     $values[] = $id;
     $stmt = $pdo->prepare('UPDATE posts SET ' . implode(', ', $fields) . ' WHERE id = ?');
     $stmt->execute($values);
+
+    // A replaced cover picture is removed from the server.
+    if ($old && array_key_exists('cover_image', $body) && $body['cover_image'] !== $old['cover_image']) {
+        delete_unreferenced_uploads($pdo, [$old['cover_image']]);
+    }
 
     $stmt = $pdo->prepare('SELECT * FROM posts WHERE id = ?');
     $stmt->execute([$id]);
@@ -153,8 +158,15 @@ if ($method === 'DELETE') {
     $id = $_GET['id'] ?? null;
     if (!$id) json_error(400, 'Missing ?id=.');
 
+    $stmt = $pdo->prepare('SELECT cover_image FROM posts WHERE id = ?');
+    $stmt->execute([$id]);
+    $old = $stmt->fetch();
+
     $stmt = $pdo->prepare('DELETE FROM posts WHERE id = ?');
     $stmt->execute([$id]);
+
+    // Its uploaded picture goes too, so it isn't downloadable after deletion.
+    if ($old) delete_unreferenced_uploads($pdo, [$old['cover_image']]);
     json_ok();
 }
 

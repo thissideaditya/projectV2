@@ -2,8 +2,7 @@
 /**
  * ADA LAW Chambers — api/media.php
  * ---------------------------------------------------------------
- * Streams uploaded files (articles, resources, post images, resumes,
- * magazines)
+ * Streams uploaded files (articles, resources, post images, magazines)
  * from PERSIST_DIR — a folder that sits OUTSIDE public_html, one
  * level above your git repo's root. Hostinger's GitHub deployment
  * only manages the contents of public_html, so anything stored
@@ -22,7 +21,9 @@ require __DIR__ . '/config.php';
 $type = isset($_GET['type']) ? $_GET['type'] : '';
 $file = isset($_GET['file']) ? basename($_GET['file']) : '';
 
-$allowedTypes = ['articles', 'resources', 'posts', 'resumes', 'magazines'];
+// Never 'resumes': applicants' CVs are private and only served by the
+// admin-only api/download-resume.php.
+$allowedTypes = ['articles', 'resources', 'posts', 'magazines'];
 if (!in_array($type, $allowedTypes, true) || $file === '') {
     http_response_code(404);
     exit('Not found.');

@@ -132,7 +132,7 @@ if ($post) {
       </header>
       <img src="<?php echo h($post['cover_image']); ?>" alt="" style="border-radius:6px;margin-bottom:2.5rem;max-height:420px;object-fit:cover;width:100%;">
       <?php // Admin-authored HTML from the rich-text editor, shown as-is (same as posts-render.js). ?>
-      <div class="article-body"><?php echo $post['content']; ?></div>
+      <div class="article-body"><?php echo site_post_body((string) $post['content']); ?></div>
     </div>
 <?php else: ?>
     <div id="article-mount">

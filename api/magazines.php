@@ -119,9 +119,22 @@ if ($method === 'PUT') {
 
     if (!$fields) json_error(400, 'No fields to update.');
 
+    $stmt = $pdo->prepare('SELECT file_url, cover_image FROM magazines WHERE id = ?');
+    $stmt->execute([$id]);
+    $old = $stmt->fetch();
+
     $values[] = $id;
     $stmt = $pdo->prepare('UPDATE magazines SET ' . implode(', ', $fields) . ' WHERE id = ?');
     $stmt->execute($values);
+
+    // A replaced PDF / cover is removed from the server.
+    if ($old) {
+        $replaced = [];
+        foreach (['file_url', 'cover_image'] as $col) {
+            if (array_key_exists($col, $body) && $body[$col] !== $old[$col]) $replaced[] = $old[$col];
+        }
+        delete_unreferenced_uploads($pdo, $replaced);
+    }
 
     $stmt = $pdo->prepare('SELECT * FROM magazines WHERE id = ?');
     $stmt->execute([$id]);
@@ -136,8 +149,15 @@ if ($method === 'DELETE') {
     $id = $_GET['id'] ?? null;
     if (!$id) json_error(400, 'Missing ?id=.');
 
+    $stmt = $pdo->prepare('SELECT file_url, cover_image FROM magazines WHERE id = ?');
+    $stmt->execute([$id]);
+    $old = $stmt->fetch();
+
     $stmt = $pdo->prepare('DELETE FROM magazines WHERE id = ?');
     $stmt->execute([$id]);
+
+    // Its PDF and cover go too, so they aren't downloadable after deletion.
+    if ($old) delete_unreferenced_uploads($pdo, [$old['file_url'], $old['cover_image']]);
     json_ok();
 }
 

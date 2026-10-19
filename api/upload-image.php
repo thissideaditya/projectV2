@@ -3,8 +3,10 @@
  * ADA LAW Chambers — api/upload-image.php
  * ---------------------------------------------------------------
  * POST (multipart/form-data, field name "image") — admin only.
- * Saves the uploaded picture into /uploads/posts/ and returns its
- * public URL, ready to drop straight into a post's cover_image.
+ * Saves the uploaded picture into PERSIST_DIR/posts/ (outside
+ * public_html, so it survives every redeploy — see config.php) and
+ * returns its public URL (served by api/media.php), ready to drop
+ * straight into a post's cover_image.
  * ---------------------------------------------------------------
  */
 
@@ -36,7 +38,7 @@ if (!in_array($mime, IMAGE_ALLOWED_MIME, true)) {
     json_error(400, 'File does not look like a valid image.');
 }
 
-$dir = UPLOAD_DIR . '/posts';
+$dir = PERSIST_DIR . '/posts';
 if (!is_dir($dir)) {
     mkdir($dir, 0755, true);
 }
@@ -48,4 +50,4 @@ if (!move_uploaded_file($file['tmp_name'], $destination)) {
     json_error(500, 'Could not save the uploaded image.');
 }
 
-json_ok(['url' => UPLOAD_URL_BASE . '/posts/' . $filename]);
+json_ok(['url' => MEDIA_URL_BASE . '?type=posts&file=' . urlencode($filename)]);

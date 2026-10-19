@@ -88,7 +88,9 @@
       // saved as HTML (bold/italic/headings/font size), so it's
       // rendered as-is rather than escaped - there's no public
       // submission path into this field.
-      var contentHtml = post.content || "";
+      // The page's only H1 is the title: body H1s (older posts) show as H2.
+      // Same rule as site_post_body() in inc/site.php.
+      var contentHtml = (post.content || "").replace(/<(\/?)h1(?=[\s>])/gi, "<$1h2");
 
       mount.innerHTML =
         '<header class="article-header">' +

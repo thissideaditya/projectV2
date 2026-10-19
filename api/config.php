@@ -108,20 +108,40 @@ define('MAGAZINE_MAX_BYTES', 50 * 1024 * 1024); // 50MB
 // the settings above, not an admin session or CORS headers — they define
 // ADA_PAGE_RENDER first, so visitors don't get a session cookie on every
 // page view (which would also stop pages from being cached).
+// Don't advertise the exact PHP version to every visitor.
+header_remove('X-Powered-By');
+
 if (!defined('ADA_PAGE_RENDER')) {
 
+// Admin login cookie: HttpOnly (scripts can't read it) and SameSite=Lax
+// (other websites can't send it along with their requests, so a page
+// elsewhere can't act as a logged-in admin). Secure whenever the site is
+// on HTTPS — Hostinger's CDN reports that through X-Forwarded-Proto.
+$__https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => $__https,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
 session_start();
 
 // ---------------------------------------------------------------
-// CORS — allows the frontend to call these endpoints. If your site
-// and this /api folder are on the SAME domain (the normal Hostinger
-// setup — everything under one public_html), this is not strictly
-// needed, but it's harmless to leave in.
+// CORS — the site and /api are on the same domain, so browsers don't
+// need any CORS headers for the site itself. They are sent only to the
+// site's own addresses; any other website gets none, so it cannot read
+// API responses (messages, applications) with a logged-in admin's session.
 // ---------------------------------------------------------------
-header('Access-Control-Allow-Origin: ' . (isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '*'));
-header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+$__origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($__origin, ['https://www.adalawchambers.com', 'https://adalawchambers.com'], true)) {
+    header('Access-Control-Allow-Origin: ' . $__origin);
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization');
+    header('Vary: Origin');
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -231,4 +251,60 @@ function looks_like_spam(array $data): bool
         return true;
     }
     return false;
+}
+
+/**
+ * Deletes a file this site uploaded, given the URL stored in the database
+ * (e.g. "/api/media.php?type=magazines&file=ab12-1700000000.pdf" or a
+ * legacy "/uploads/posts/ab12-1700000000.png"). Anything else — external
+ * URLs, placeholder images, bundled assets — is left alone. Called when a
+ * post/article/magazine is deleted or its file replaced, so removed files
+ * stop being downloadable.
+ */
+function delete_uploaded_file(?string $url): void
+{
+    if (!$url) return;
+    $path = null;
+    $parts = parse_url($url);
+    if (($parts['path'] ?? '') === MEDIA_URL_BASE && !empty($parts['query'])) {
+        parse_str($parts['query'], $q);
+        $type = $q['type'] ?? '';
+        $file = basename((string) ($q['file'] ?? ''));
+        if (in_array($type, ['articles', 'resources', 'posts', 'magazines'], true) && $file !== '') {
+            $path = PERSIST_DIR . '/' . $type . '/' . $file;
+        }
+    } elseif (preg_match('~^' . preg_quote(UPLOAD_URL_BASE, '~') . '/posts/([^/?#]+)$~', $parts['path'] ?? '', $m)) {
+        $path = UPLOAD_DIR . '/posts/' . basename($m[1]);
+    }
+    if ($path && is_file($path)) {
+        @unlink($path);
+    }
+}
+
+/**
+ * delete_uploaded_file() for each of $urls that no row in any content
+ * table still points to (the same picture can be reused by two posts).
+ */
+function delete_unreferenced_uploads(PDO $pdo, array $urls): void
+{
+    $checks = [
+        'SELECT COUNT(*) FROM posts WHERE cover_image = ?',
+        'SELECT COUNT(*) FROM articles WHERE file_url = ? OR cover_image = ?',
+        'SELECT COUNT(*) FROM magazines WHERE file_url = ? OR cover_image = ?',
+    ];
+    foreach (array_unique(array_filter($urls)) as $url) {
+        $inUse = 0;
+        foreach ($checks as $sql) {
+            try {
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute(array_fill(0, substr_count($sql, '?'), $url));
+                $inUse += (int) $stmt->fetchColumn();
+            } catch (PDOException $e) {
+                $inUse++; // table missing or unreadable: don't risk deleting
+            }
+        }
+        if ($inUse === 0) {
+            delete_uploaded_file($url);
+        }
+    }
 }

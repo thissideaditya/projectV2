@@ -119,19 +119,27 @@ if ($method === 'PUT') {
             $values[] = $body[$col];
         }
     }
-    if (array_key_exists('title', $body) && !array_key_exists('slug', $body)) {
-        $fields[] = 'slug = ?';
-        $values[] = slugify($body['title']);
-    } elseif (array_key_exists('slug', $body)) {
-        $fields[] = 'slug = ?';
-        $values[] = slugify($body['slug']);
-    }
+    // The slug is set once at creation and kept when the title changes, so
+    // any address built on it stays stable (and can't collide with another).
 
     if (!$fields) json_error(400, 'No fields to update.');
+
+    $stmt = $pdo->prepare('SELECT file_url, cover_image FROM articles WHERE id = ?');
+    $stmt->execute([$id]);
+    $old = $stmt->fetch();
 
     $values[] = $id;
     $stmt = $pdo->prepare('UPDATE articles SET ' . implode(', ', $fields) . ' WHERE id = ?');
     $stmt->execute($values);
+
+    // A replaced file / cover is removed from the server.
+    if ($old) {
+        $replaced = [];
+        foreach (['file_url', 'cover_image'] as $col) {
+            if (array_key_exists($col, $body) && $body[$col] !== $old[$col]) $replaced[] = $old[$col];
+        }
+        delete_unreferenced_uploads($pdo, $replaced);
+    }
 
     $stmt = $pdo->prepare('SELECT * FROM articles WHERE id = ?');
     $stmt->execute([$id]);
@@ -146,8 +154,15 @@ if ($method === 'DELETE') {
     $id = $_GET['id'] ?? null;
     if (!$id) json_error(400, 'Missing ?id=.');
 
+    $stmt = $pdo->prepare('SELECT file_url, cover_image FROM articles WHERE id = ?');
+    $stmt->execute([$id]);
+    $old = $stmt->fetch();
+
     $stmt = $pdo->prepare('DELETE FROM articles WHERE id = ?');
     $stmt->execute([$id]);
+
+    // Its uploaded file goes too, so it isn't downloadable after deletion.
+    if ($old) delete_unreferenced_uploads($pdo, [$old['file_url'], $old['cover_image']]);
     json_ok();
 }
 

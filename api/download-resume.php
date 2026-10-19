@@ -27,10 +27,14 @@ if (!$row || !$row['resume_path']) {
     json_error(404, 'No resume found for this application.');
 }
 
-// resume_path is stored as e.g. "/uploads/resumes/ab12cd34-169999.pdf" —
-// resolve it to the real file on disk under UPLOAD_DIR.
+// resume_path is stored as e.g. "/uploads/resumes/ab12cd34-169999.pdf";
+// only the filename matters. New resumes are saved in PERSIST_DIR (which
+// survives redeploys); older ones may still be in public_html/uploads.
 $filename = basename($row['resume_path']);
-$filePath = UPLOAD_DIR . '/resumes/' . $filename;
+$filePath = PERSIST_DIR . '/resumes/' . $filename;
+if (!is_file($filePath)) {
+    $filePath = UPLOAD_DIR . '/resumes/' . $filename;
+}
 
 if (!is_file($filePath)) {
     json_error(404, 'Resume file is missing from the server.');

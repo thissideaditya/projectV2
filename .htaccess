@@ -52,15 +52,58 @@
   RewriteCond %{QUERY_STRING} ^slug=(.*)$
   RewriteRule ^post\.html$ /post.php?slug=%1 [R=301,L]
 
+  # render.php is only an internal helper: someone typing /render.php
+  # directly goes to the home page instead of a duplicate copy of it.
+  # (THE_REQUEST is the visitor's original request line, so the internal
+  # rewrites below are not affected.)
+  RewriteCond %{THE_REQUEST} \s/render\.php[\s?]
+  RewriteRule ^render\.php$ / [R=301,L,QSD]
+
   # Public pages are built on the server by render.php (header, footer,
   # breadcrumbs and database lists filled in) so search engines see the
   # whole page. The address stays the same .html URL. Only top-level
   # pages that exist are routed; /admin/ and everything else is untouched.
   # (No QSA: the visitor's own query string must not choose the page.)
+  # 404.html is excluded: it is the ErrorDocument below, and an error page
+  # routed into PHP was sometimes sent as raw source on Hostinger. It is
+  # served as a plain file and loads its header/footer in the browser.
   RewriteRule ^$ render.php?page=index [L]
+  RewriteCond %{REQUEST_URI} !^/404\.html$
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^([a-z0-9-]+)\.html$ render.php?page=$1 [L]
 </IfModule>
 
 # Friendly "Page not found" page for any missing URL.
 ErrorDocument 404 /404.html
+
+# ---------------------------------------------------------------
+# Security headers for every response.
+#   HSTS: browsers always use https:// for this site from now on.
+#   X-Frame-Options: other sites can't show these pages (incl. the
+#     admin panel) inside a frame to trick clicks.
+#   nosniff: files are only treated as the type the server says.
+#   Referrer-Policy: other sites only see the domain a visitor came from.
+#   Permissions-Policy: the site never asks for camera/mic/location.
+# X-Powered-By is removed so the PHP version isn't advertised.
+# ---------------------------------------------------------------
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always unset X-Powered-By
+  Header unset X-Powered-By
+</IfModule>
+
+# Project notes and database scripts (README.md, api/schema.sql, ...)
+# are for the developer, not website visitors.
+<FilesMatch "\.(md|sql)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>

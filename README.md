@@ -34,9 +34,7 @@ ada-law-Chambers/
 │   ├── upload-image.php            Admin picture upload for post covers
 │   ├── careers.php                 Careers form submissions + resume upload
 │   └── contact.php                 Contact form submissions
-└── uploads/
-    ├── resumes/                    Uploaded PDF/DOCX resumes land here
-    └── posts/                      Admin-uploaded post cover images land here
+└── uploads/                      Older uploads only (see "Where uploads are stored")
 ```
 
 ## Running locally (frontend only, no database)
@@ -251,6 +249,21 @@ CREATE TABLE IF NOT EXISTS magazines (
 PHP's own upload limit must allow 50MB PDFs: in hPanel → **Advanced → PHP
 Configuration**, set `upload_max_filesize` and `post_max_size` to at least
 `64M`.
+
+### Where uploads are stored
+
+Every upload — post pictures, articles, magazines, résumés — is saved in
+`persistent-uploads/`, the folder **next to** `public_html` (not inside
+it), so deploying never deletes them. Pictures and documents are served
+through `api/media.php`; résumés are private and only downloadable from
+the admin panel. Deleting a post, article or magazine (or replacing its
+file) also deletes the old file. `public_html/uploads/` only holds files
+uploaded before this change.
+
+### Admin sign-in protection
+
+After 5 wrong passwords from the same connection (or 20 for the same
+account) within 15 minutes, sign-in is paused until the 15 minutes pass.
 
 ### WhatsApp notifications on form submit
 

@@ -114,17 +114,9 @@ CREATE TABLE IF NOT EXISTS magazines (
 -- exists) — every statement here uses IF NOT EXISTS so it's safe either
 -- way to run the whole file again.
 
--- Sample published posts so Rules/Thoughts aren't empty on first load.
--- Safe to delete from phpMyAdmin once you've added your own.
-INSERT INTO posts (category, title, slug, excerpt, content, cover_image, status) VALUES
-('rule', 'Understanding Place of Supply Under GST', 'understanding-place-of-supply-under-gst',
- 'A plain-language walkthrough of how place-of-supply rules decide whether a transaction attracts CGST/SGST or IGST.',
- 'Place of supply determines which government has the right to tax a transaction under GST. Getting this wrong is one of the most common errors businesses make in return filing.',
- 'https://picsum.photos/seed/rule-gst-1/800/500', 'published'),
-('thought', 'Why GST Litigation Is Entering a New Phase', 'why-gst-litigation-entering-new-phase',
- 'With GSTAT benches becoming operational, disputes that once sat in limbo finally have a forum.',
- 'For years, taxpayers with GST disputes had no dedicated appellate tribunal to turn to. As GST Appellate Tribunal benches become operational, we expect a meaningful shift in how disputes are resolved.',
- 'https://picsum.photos/seed/thought-1/800/500', 'published');
+-- (No sample posts are inserted: placeholder content would go live and
+-- into the sitemap. Rules/Thoughts show "Nothing published here yet"
+-- until the first real post is published from /admin/.)
 
 -- NOTE: no admin row is created here on purpose — passwords must be
 -- hashed by PHP (password_hash), not pasted in as plain text via SQL.
