@@ -42,7 +42,7 @@
 
   async function renderResources() {
     var mount = document.getElementById("resources-listing");
-    if (!mount) return;
+    if (!mount || mount.hasAttribute("data-ssr")) return; // already rendered on the server (inc/site.php)
 
     try {
       var resources = await window.ADA.data.fetchResources();

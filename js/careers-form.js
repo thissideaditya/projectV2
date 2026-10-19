@@ -17,6 +17,9 @@
 
   var WHATSAPP_NUMBER = "+918796630295";
 
+  // Spam check: how long the page was open before sending (see looks_like_spam in api/config.php).
+  var OPENED_AT = Date.now();
+
   function setStatus(el, text, isError) {
     el.hidden = false;
     el.textContent = text;
@@ -59,6 +62,7 @@
     if (resumeFile) {
       formData.append("resume", resumeFile);
     }
+    formData.append("elapsed_ms", String(Date.now() - OPENED_AT));
 
     submitBtn.disabled = true;
     var label = submitBtn.querySelector(".cr-submit-label") || submitBtn; // keep the arrow icon
@@ -108,6 +112,7 @@
         study_year: document.getElementById("i-year").value.trim(),
         duration: document.getElementById("i-duration").value.trim(),
         message: document.getElementById("i-message").value.trim(),
+        website: document.getElementById("i-website").value, // hidden spam trap
       };
       var resumeFile = document.getElementById("i-resume").files[0];
 
@@ -142,6 +147,7 @@
         years_experience: document.getElementById("a-exp").value.trim(),
         practice_area: document.getElementById("a-area").value.trim(),
         message: document.getElementById("a-message").value.trim(),
+        website: document.getElementById("a-website").value, // hidden spam trap
       };
       var resumeFile = document.getElementById("a-resume").files[0];
 

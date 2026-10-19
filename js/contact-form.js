@@ -62,6 +62,7 @@ var CONTACT_RECEIVING_EMAIL = "contact@adalawChambers.com";
     if (!form) return;
 
     var statusBox = document.getElementById("contact-status");
+    var openedAt = Date.now(); // spam check: how long the form was open (see looks_like_spam in api/config.php)
     var submitBtn = form.querySelector('button[type="submit"]');
     // the button may hold an icon next to its text; only swap the text
     var submitLabel = submitBtn.querySelector(".cv-submit-label") || submitBtn;
@@ -75,6 +76,8 @@ var CONTACT_RECEIVING_EMAIL = "contact@adalawChambers.com";
         phone: document.getElementById("c-phone").value.trim(),
         subject: document.getElementById("c-subject").value.trim() || "Website enquiry",
         message: document.getElementById("c-message").value.trim(),
+        website: document.getElementById("c-website").value, // hidden spam trap, empty for people
+        elapsed_ms: Date.now() - openedAt,
       };
 
       if (!payload.name || !payload.email || !payload.message) {

@@ -1,0 +1,9 @@
+# ADA Law Chambers — robots.txt
+# Admin panel and API endpoints are not pages for search results.
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+# Uploaded magazines/articles are served through the API but are real content.
+Allow: /api/media.php
+
+Sitemap: https://www.adalawchambers.com/sitemap.xml

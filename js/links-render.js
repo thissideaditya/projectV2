@@ -13,7 +13,7 @@
 
   async function renderLinks() {
     var mount = document.getElementById("links-listing");
-    if (!mount) return;
+    if (!mount || mount.hasAttribute("data-ssr")) return; // already rendered on the server (inc/site.php)
 
     try {
       var links = await window.ADA.data.fetchLinks();

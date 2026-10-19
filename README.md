@@ -187,6 +187,32 @@ landing page. Manage it entirely from **`/admin/links.html`** — add a
 title, URL, optional description, and a display order (lower numbers show
 first). No code edits required.
 
+### How public pages are built (SEO)
+
+Every public `.html` page is served through **`render.php`** (see the
+render rule in `.htaccess`); the address in the browser doesn't change.
+Before the page is sent, the server fills in the shared header and
+footer (`partials/`), the breadcrumbs, and the database lists (Rules,
+Thoughts, Articles, Magazines, Resources, Important Links), so search
+engines see the complete page without running JavaScript. `post.php`
+does the same for single posts. The building code is in
+**`inc/site.php`**.
+
+- To edit the header/footer: still just `partials/header.html` and
+  `partials/footer.html`.
+- If you change how a card looks in a `js/*-render.js` file, make the
+  same change in the matching function in `inc/site.php`.
+- If the database is unreachable, pages still load and the browser
+  scripts fill in the lists, exactly as before.
+
+### Spam protection on forms
+
+The Contact and Careers forms carry a hidden field people never see
+and record how long the form was open. Submissions that fill the
+hidden field, arrive in under 3 seconds, or skip the website's own
+form entirely get a normal "thank you" reply but are **not saved**
+(see `looks_like_spam()` in `api/config.php`).
+
 ### Magazines
 
 A public page, **`magazines.html`**, listed under the Insights dropdown, on

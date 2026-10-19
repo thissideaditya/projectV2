@@ -62,7 +62,7 @@
 
   async function renderArticles() {
     var mount = document.getElementById("articles-listing");
-    if (!mount) return;
+    if (!mount || mount.hasAttribute("data-ssr")) return; // already rendered on the server (inc/site.php)
 
     try {
       // Never hang on "Loading…": give up after 15s and show a clear message.

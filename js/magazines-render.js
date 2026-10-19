@@ -65,6 +65,7 @@
   }
 
   async function render(mount, limit, emptyHtml) {
+    if (mount.hasAttribute("data-ssr")) return; // already rendered on the server (inc/site.php)
     try {
       // Never hang on "Loading…": give up after 15s and show a clear message.
       var magazines = await Promise.race([

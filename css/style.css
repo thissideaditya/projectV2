@@ -1799,6 +1799,25 @@ body.disclaimer-active .floating-contact { display: none; }
 .feed-btn span { transition: transform .25s var(--ease); }
 .feed-btn:hover span { transform: translateX(4px); }
 
+/* Spam-trap field in the Contact/Careers forms: off-screen, not display:none
+   (some bots skip fields that are hidden that way). */
+.hp-field { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+
+/* ---- Breadcrumbs (written in by inc/site.php: page heroes, careers intro, posts) ----
+   Colour comes from the surrounding text: cream on the green heroes, dark on light sections. */
+.breadcrumbs ol {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .5rem; margin: 0; padding: 0; list-style: none;
+  font-family: "Inter", sans-serif; font-size: .78rem; letter-spacing: .03em; line-height: 1.4;
+}
+.breadcrumbs li { display: inline-flex; align-items: center; gap: .5rem; }
+.breadcrumbs li + li::before { content: "\203A"; opacity: .55; }
+.breadcrumbs a { color: inherit; opacity: .78; text-decoration: none; }
+.breadcrumbs a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+.breadcrumbs [aria-current="page"] { font-weight: 600; }
+.cr-intro-inner .breadcrumbs { margin-bottom: 1rem; color: var(--green-950); }
+.cr-intro-inner .breadcrumbs ol { justify-content: center; }
+.section .breadcrumbs { margin-bottom: 1rem; color: var(--ink-700); }
+
 /* ---- Magazines (home section + magazines.html) ----
    Cards share .feed-card; covers are portrait. Issues uploaded without a
    cover picture get .magazine-cover-ph (js/magazines-render.js). */

@@ -47,7 +47,7 @@
 
   async function renderListing() {
     var mount = document.getElementById("post-listing");
-    if (!mount) return;
+    if (!mount || mount.hasAttribute("data-ssr")) return; // already rendered on the server (inc/site.php)
     var category = mount.getAttribute("data-category");
     var basePath = mount.getAttribute("data-base-path") || "";
 
@@ -67,7 +67,7 @@
 
   async function renderArticle() {
     var mount = document.getElementById("article-mount");
-    if (!mount) return;
+    if (!mount || mount.hasAttribute("data-ssr")) return; // already rendered on the server (post.php)
 
     var params = new URLSearchParams(window.location.search);
     var slug = params.get("slug");

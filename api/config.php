@@ -104,6 +104,12 @@ define('MAGAZINE_ALLOWED_EXT', ['pdf']);
 define('MAGAZINE_ALLOWED_MIME', ['application/pdf']);
 define('MAGAZINE_MAX_BYTES', 50 * 1024 * 1024); // 50MB
 
+// Public pages rendered by render.php / post.php / sitemap.php only need
+// the settings above, not an admin session or CORS headers — they define
+// ADA_PAGE_RENDER first, so visitors don't get a session cookie on every
+// page view (which would also stop pages from being cached).
+if (!defined('ADA_PAGE_RENDER')) {
+
 session_start();
 
 // ---------------------------------------------------------------
@@ -120,6 +126,8 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
+}
+
 }
 
 /**
@@ -200,4 +208,27 @@ function slugify(string $str): string
     $str = strtolower(trim($str));
     $str = preg_replace('/[^a-z0-9]+/', '-', $str);
     return trim($str, '-');
+}
+
+/**
+ * Spam check for the public Contact / Careers forms. True when the
+ * submission looks automated:
+ *   - "website" is a hidden honeypot field people never see, so only
+ *     bots fill it in;
+ *   - "elapsed_ms" is how long the form was open before sending, added
+ *     by the site's own JavaScript. A missing value (a bot posting
+ *     straight to the API) or under 3 seconds is not a person typing.
+ * Callers answer spam with the normal success response and store
+ * nothing, so bots get no signal to adapt to.
+ */
+function looks_like_spam(array $data): bool
+{
+    if (trim((string) ($data['website'] ?? '')) !== '') {
+        return true;
+    }
+    $elapsed = $data['elapsed_ms'] ?? null;
+    if (!is_numeric($elapsed) || (int) $elapsed < 3000) {
+        return true;
+    }
+    return false;
 }

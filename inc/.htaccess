@@ -1,0 +1,9 @@
+# Server-side helpers only — included by render.php / post.php, never
+# visited directly.
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

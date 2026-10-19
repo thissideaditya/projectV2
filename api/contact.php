@@ -16,6 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $body = json_body();
 
+// Bots get the normal success reply, and nothing is stored.
+if (looks_like_spam($body)) {
+    json_ok(['message' => 'Thank you — your message has been received.'], 201);
+}
+
 $name = trim($body['name'] ?? '');
 $email = trim($body['email'] ?? '');
 $phone = trim($body['phone'] ?? '');

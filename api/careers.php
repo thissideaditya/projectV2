@@ -25,6 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_error(405, 'Method not allowed.');
 }
 
+// Bots get the normal success reply, and nothing (including any resume) is stored.
+if (looks_like_spam($_POST)) {
+    json_ok(['message' => 'Application received. Thank you — our Chambers will reach out if there is a fit.'], 201);
+}
+
 $type = $_POST['application_type'] ?? '';
 if (!in_array($type, ['internship', 'associate'], true)) {
     json_error(400, 'Invalid application_type.');
