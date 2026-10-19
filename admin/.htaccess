@@ -1,0 +1,26 @@
+# ADA Law Chambers — admin pages are only served to a signed-in admin.
+# Every admin/*.html page except the login page (index.html) goes through
+# gate.php, which checks the admin session on the server first and sends
+# anyone else to the login page. (admin.js also checks in the browser.)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Same one-address rule as the site root (this file replaces the root's
+  # rewrite rules inside /admin/).
+  RewriteCond %{HTTP_HOST} ^adalawchambers\.com$ [NC,OR]
+  RewriteCond %{HTTP_HOST} \.hostingersite\.com$ [NC]
+  RewriteRule ^ https://www.adalawchambers.com%{REQUEST_URI} [R=301,L]
+
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteCond %{REQUEST_URI} !/admin/index\.html$
+  RewriteRule ^([a-z0-9-]+\.html)$ gate.php?page=$1 [L]
+</IfModule>
+
+# Admin pages are never cached by browsers or the CDN.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|php)$">
+    Header set Cache-Control "no-store"
+  </FilesMatch>
+</IfModule>
+
+Options -Indexes

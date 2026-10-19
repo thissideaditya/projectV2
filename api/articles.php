@@ -35,8 +35,9 @@ if ($method === 'GET') {
         require_admin();
 
         if (isset($_GET['id'])) {
+            $id = query_id();
             $stmt = $pdo->prepare('SELECT * FROM articles WHERE id = ?');
-            $stmt->execute([$_GET['id']]);
+            $stmt->execute([$id]);
             $article = $stmt->fetch();
             json_ok(['article' => $article ?: null]);
         }
@@ -45,9 +46,9 @@ if ($method === 'GET') {
         json_ok(['articles' => $stmt->fetchAll()]);
     }
 
-    if (!empty($_GET['slug'])) {
+    if (query_str('slug') !== '') {
         $stmt = $pdo->prepare("SELECT * FROM articles WHERE slug = ? AND status = 'published'");
-        $stmt->execute([$_GET['slug']]);
+        $stmt->execute([query_str('slug')]);
         $article = $stmt->fetch();
         json_ok(['article' => $article ?: null]);
     }
@@ -106,8 +107,7 @@ if ($method === 'POST') {
 // ---------------------------------------------------------------
 if ($method === 'PUT') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $body = json_body();
     $fields = [];
@@ -151,8 +151,7 @@ if ($method === 'PUT') {
 // ---------------------------------------------------------------
 if ($method === 'DELETE') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $stmt = $pdo->prepare('SELECT file_url, cover_image FROM articles WHERE id = ?');
     $stmt->execute([$id]);
@@ -171,5 +170,5 @@ json_error(405, 'Method not allowed.');
 } catch (PDOException $e) {
     // Common cause: the articles table hasn't been created yet in this
     // database — see api/schema.sql for the CREATE TABLE block.
-    json_error(500, 'Database error in articles.php: ' . $e->getMessage());
+    db_failure($e, 'articles.php');
 }

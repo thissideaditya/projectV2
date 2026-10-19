@@ -6,10 +6,19 @@
 (function () {
   "use strict";
 
+  // Escapes text for HTML, including inside attribute values ("…").
   function escapeHtml(str) {
-    var div = document.createElement("div");
-    div.textContent = str || "";
-    return div.innerHTML;
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  // Only web, mail and phone links (or this site's own paths) may become an
+  // href/src; anything else (javascript:, data:, ...) is replaced with "#".
+  function safeUrl(url) {
+    var u = String(url == null ? "" : url).trim();
+    if (/^(https?:|mailto:|tel:)/i.test(u) || /^(\/(?!\/)|\.{1,2}\/|[\w\-.~%]+(\/|\?|#|$))/.test(u) && u.indexOf(":") === -1) return u;
+    return "#";
   }
 
   function formatDate(iso) {
@@ -49,10 +58,10 @@
       '<article class="post-card">' +
         '<div class="body">' +
           '<span class="meta">' + escapeHtml(fileTypeLabel(article.file_type)) + " &middot; " + formatDate(article.created_at) + "</span>" +
-          '<h3><a class="article-title-link" href="' + escapeHtml(openUrl) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(article.title) + "</a></h3>" +
+          '<h3><a class="article-title-link" href="' + escapeHtml(safeUrl(openUrl)) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(article.title) + "</a></h3>" +
           (article.description ? "<p>" + escapeHtml(article.description) + "</p>" : "") +
           '<div class="card-actions" style="justify-content:flex-start;">' +
-            '<a class="btn btn--sm btn--gold" href="' + escapeHtml(article.file_url) + '" download="' + escapeHtml(fileName) + '">Download &darr;</a>' +
+            '<a class="btn btn--sm btn--gold" href="' + escapeHtml(safeUrl(article.file_url)) + '" download="' + escapeHtml(fileName) + '">Download &darr;</a>' +
             (window.ADA_SHARE ? window.ADA_SHARE.button(article.file_url, article.title) : "") +
           '</div>' +
         "</div>" +

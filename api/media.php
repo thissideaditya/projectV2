@@ -16,10 +16,12 @@
  * ---------------------------------------------------------------
  */
 
+// Public files: no admin session or cookie needed (see config.php).
+define('ADA_PAGE_RENDER', true);
 require __DIR__ . '/config.php';
 
-$type = isset($_GET['type']) ? $_GET['type'] : '';
-$file = isset($_GET['file']) ? basename($_GET['file']) : '';
+$type = query_str('type');
+$file = basename(query_str('file'));
 
 // Never 'resumes': applicants' CVs are private and only served by the
 // admin-only api/download-resume.php.

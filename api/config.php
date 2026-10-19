@@ -111,6 +111,23 @@ define('MAGAZINE_MAX_BYTES', 50 * 1024 * 1024); // 50MB
 // Don't advertise the exact PHP version to every visitor.
 header_remove('X-Powered-By');
 
+// Production mode: PHP errors go to the server's error log, never into a
+// page or API response (they can reveal file paths, SQL and settings).
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
+// Anything unexpected (e.g. a database error in an endpoint without its own
+// try/catch) is logged privately; the visitor only gets a generic message.
+set_exception_handler(function (Throwable $e) {
+    error_log('[ADA] Uncaught ' . get_class($e) . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+    }
+    echo json_encode(['ok' => false, 'error' => 'Something went wrong on the server. Please try again.']);
+});
+
 if (!defined('ADA_PAGE_RENDER')) {
 
 // Admin login cookie: HttpOnly (scripts can't read it) and SameSite=Lax
@@ -127,6 +144,35 @@ session_set_cookie_params([
     'samesite' => 'Lax',
 ]);
 session_start();
+
+// Admin sessions end after 2 hours without activity, and after 12 hours
+// in total, so a forgotten signed-in browser doesn't stay an open door.
+if (!empty($_SESSION['admin_id'])) {
+    $__now = time();
+    $__idle = $__now - (int) ($_SESSION['last_seen'] ?? $__now);
+    $__age = $__now - (int) ($_SESSION['signed_in_at'] ?? $__now);
+    if ($__idle > 2 * 3600 || $__age > 12 * 3600) {
+        $_SESSION = [];
+        session_regenerate_id(true);
+    } else {
+        $_SESSION['last_seen'] = $__now;
+    }
+}
+
+// Requests that change data (POST/PUT/DELETE) must come from this
+// website's own pages. Browsers always send Origin on these; one from any
+// other site is refused (defence against cross-site request forgery, on
+// top of the SameSite cookie). Server-to-server calls send no Origin.
+if (in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['POST', 'PUT', 'PATCH', 'DELETE'], true) && !empty($_SERVER['HTTP_ORIGIN'])) {
+    $__originHost = strtolower((string) parse_url($_SERVER['HTTP_ORIGIN'], PHP_URL_HOST));
+    $__ownHost = strtolower(preg_replace('~:\d+$~', '', (string) ($_SERVER['HTTP_HOST'] ?? '')));
+    if ($__originHost === '' || ($__originHost !== $__ownHost && !in_array($__originHost, ['www.adalawchambers.com', 'adalawchambers.com'], true))) {
+        http_response_code(403);
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => false, 'error' => 'Request not allowed from this origin.']);
+        exit;
+    }
+}
 
 // ---------------------------------------------------------------
 // CORS — the site and /api are on the same domain, so browsers don't
@@ -307,4 +353,204 @@ function delete_unreferenced_uploads(PDO $pdo, array $urls): void
             delete_uploaded_file($url);
         }
     }
+}
+
+/**
+ * Makes post HTML (from the admin rich-text editor) safe to show to
+ * visitors: keeps formatting the editor can produce — paragraphs,
+ * bold/italic/underline, headings, lists, links, font family/size —
+ * and removes everything else: <script>, <iframe>, forms, event
+ * handlers (onclick, onerror, ...), javascript: links and CSS that
+ * could load or run anything. <h1> becomes <h2> (the post title is the
+ * page's only H1). Applied when a post is saved AND when it is shown,
+ * so older posts are covered too.
+ */
+function sanitize_post_html(?string $html): string
+{
+    $html = (string) $html;
+    if (trim($html) === '') return '';
+    if (!class_exists('DOMDocument')) {
+        // Without the DOM extension, fall back to plain text with line breaks.
+        return nl2br(htmlspecialchars(strip_tags($html), ENT_QUOTES, 'UTF-8'));
+    }
+
+    $allowed = [
+        'p' => ['style'], 'div' => ['style'], 'span' => ['style'], 'br' => [], 'hr' => [],
+        'b' => [], 'strong' => [], 'i' => [], 'em' => [], 'u' => [], 's' => [], 'strike' => [], 'sub' => [], 'sup' => [],
+        'h2' => ['style'], 'h3' => ['style'], 'h4' => ['style'], 'h5' => ['style'], 'h6' => ['style'],
+        'ul' => [], 'ol' => [], 'li' => [], 'blockquote' => [], 'pre' => [], 'code' => [],
+        'a' => ['href', 'title'], 'font' => ['face', 'size', 'color'],
+        'table' => [], 'thead' => [], 'tbody' => [], 'tr' => [], 'th' => ['colspan', 'rowspan'], 'td' => ['colspan', 'rowspan'],
+    ];
+    // Removed together with everything inside them.
+    $drop = ['script', 'style', 'iframe', 'frame', 'frameset', 'object', 'embed', 'applet', 'svg', 'math',
+             'template', 'noscript', 'form', 'input', 'button', 'textarea', 'select', 'option', 'link', 'meta', 'base', 'title', 'head'];
+    $cssAllowed = ['font-family', 'font-size', 'font-weight', 'font-style', 'text-decoration', 'text-align', 'color', 'background-color'];
+
+    $doc = new DOMDocument();
+    $prev = libxml_use_internal_errors(true);
+    $doc->loadHTML('<?xml encoding="UTF-8"><div id="__ada_root">' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NONET);
+    libxml_clear_errors();
+    libxml_use_internal_errors($prev);
+    $root = $doc->getElementById('__ada_root');
+    if (!$root) return '';
+
+    $clean = function (DOMNode $node) use (&$clean, $doc, $allowed, $drop, $cssAllowed) {
+        // Iterate over a copy: children are removed/replaced while walking.
+        foreach (iterator_to_array($node->childNodes) as $child) {
+            if ($child instanceof DOMComment || $child instanceof DOMProcessingInstruction || $child instanceof DOMCdataSection) {
+                $node->removeChild($child);
+                continue;
+            }
+            if (!($child instanceof DOMElement)) continue; // text stays (escaped on output)
+
+            $tag = strtolower($child->tagName);
+            if (in_array($tag, $drop, true)) {
+                $node->removeChild($child);
+                continue;
+            }
+            if ($tag === 'h1') { // rename to h2, keeping the content
+                $h2 = $doc->createElement('h2');
+                while ($child->firstChild) $h2->appendChild($child->firstChild);
+                if ($child->hasAttribute('style')) $h2->setAttribute('style', $child->getAttribute('style'));
+                $node->replaceChild($h2, $child);
+                $child = $h2;
+                $tag = 'h2';
+            }
+            if (!isset($allowed[$tag])) { // unknown tag: keep its content, drop the tag
+                $clean($child);
+                while ($child->firstChild) $node->insertBefore($child->firstChild, $child);
+                $node->removeChild($child);
+                continue;
+            }
+
+            foreach (iterator_to_array($child->attributes) as $attr) {
+                $name = strtolower($attr->name);
+                $value = $attr->value;
+                $keep = in_array($name, $allowed[$tag], true);
+                if ($keep && $name === 'href') {
+                    $v = preg_replace('~[\x00-\x20]+~', '', html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                    $keep = (bool) preg_match('~^(https?:|mailto:|tel:|/(?!/)|#)~i', $v);
+                }
+                if ($keep && $name === 'style') {
+                    $parts = [];
+                    foreach (explode(';', $value) as $decl) {
+                        if (!preg_match('~^\s*([a-z-]+)\s*:\s*(.+?)\s*$~i', $decl, $m)) continue;
+                        $prop = strtolower($m[1]);
+                        $val = $m[2];
+                        // No url(), expression(), escapes or other tricks — plain values only.
+                        if (in_array($prop, $cssAllowed, true) && !preg_match('~url\s*\(|expression|javascript|\\\\|[<>@{}]|/\*~i', $val)) {
+                            $parts[] = $prop . ': ' . $val;
+                        }
+                    }
+                    $value = implode('; ', $parts);
+                    $keep = $value !== '';
+                }
+                if ($keep && in_array($name, ['colspan', 'rowspan', 'size'], true)) {
+                    $keep = (bool) preg_match('~^[0-9]{1,2}$~', $value);
+                }
+                if ($keep && $name === 'color') {
+                    $keep = (bool) preg_match('~^(#[0-9a-f]{3,8}|[a-z]{3,20})$~i', $value);
+                }
+                if ($keep) {
+                    $child->setAttribute($name, $value);
+                } else {
+                    $child->removeAttribute($attr->name);
+                }
+            }
+            if ($tag === 'a' && $child->hasAttribute('href')) {
+                // Links open safely: no access back to this page from the target.
+                $child->setAttribute('rel', 'noopener noreferrer nofollow');
+            }
+            $clean($child);
+        }
+    };
+    $clean($root);
+
+    $out = '';
+    foreach ($root->childNodes as $child) {
+        $out .= $doc->saveHTML($child);
+    }
+    return $out;
+}
+
+/** ?id= as a positive whole number, or a 400 error (rejects arrays, text, 0). */
+function query_id(): int
+{
+    $id = $_GET['id'] ?? null;
+    if (!is_string($id) || !ctype_digit($id) || (int) $id < 1) {
+        json_error(400, 'Missing or invalid ?id=.');
+    }
+    return (int) $id;
+}
+
+/** A ?name= query value as plain text ('' when missing or not text). */
+function query_str(string $name): string
+{
+    $v = $_GET[$name] ?? '';
+    return is_string($v) ? trim($v) : '';
+}
+
+/**
+ * The visitor's IP address. Behind Hostinger's CDN the real address is
+ * the LAST X-Forwarded-For entry (the one the CDN itself added); earlier
+ * entries can be typed by the visitor, so they are never trusted.
+ */
+function client_ip(): string
+{
+    $parts = array_filter(array_map('trim', explode(',', (string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ''))));
+    $last = $parts ? end($parts) : '';
+    return filter_var($last, FILTER_VALIDATE_IP) ? $last : (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+}
+
+/**
+ * Simple rate limit: allows $max hits per $windowSeconds for $key, stored
+ * as small files in PERSIST_DIR/rate-limits (outside the website). Over
+ * the limit, the request ends with 429 and $message.
+ */
+function rate_limit(string $key, int $max, int $windowSeconds, string $message): void
+{
+    $dir = PERSIST_DIR . '/rate-limits';
+    if (!is_dir($dir)) @mkdir($dir, 0700, true);
+    $file = $dir . '/' . hash('sha256', $key) . '.json';
+    $fp = @fopen($file, 'c+');
+    if (!$fp) return; // can't count: fail open rather than block real visitors
+    flock($fp, LOCK_EX);
+    $hits = json_decode((string) stream_get_contents($fp), true);
+    $cutoff = time() - $windowSeconds;
+    $hits = array_values(array_filter(is_array($hits) ? $hits : [], function ($t) use ($cutoff) { return $t > $cutoff; }));
+    $blocked = count($hits) >= $max;
+    if (!$blocked) $hits[] = time();
+    ftruncate($fp, 0);
+    rewind($fp);
+    fwrite($fp, json_encode($hits));
+    flock($fp, LOCK_UN);
+    fclose($fp);
+    if ($blocked) {
+        header('Retry-After: ' . $windowSeconds);
+        json_error(429, $message);
+    }
+}
+
+/**
+ * Cleans one text field from a public form: drops invisible control
+ * characters (keeping line breaks in multi-line fields) and trims it.
+ * Returns null when it is longer than $max characters.
+ */
+function clean_input($value, int $max, bool $multiline = false): ?string
+{
+    $v = is_string($value) ? $value : '';
+    $v = $multiline
+        ? preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]~u', '', str_replace("\r\n", "\n", $v))
+        : preg_replace('~[\x00-\x1F\x7F]~u', ' ', $v);
+    $v = trim((string) $v);
+    $len = function_exists('mb_strlen') ? mb_strlen($v, 'UTF-8') : strlen($v);
+    return $len > $max ? null : $v;
+}
+
+/** Logs a database problem server-side and answers with a generic 500 (no SQL or paths). */
+function db_failure(Throwable $e, string $where): void
+{
+    error_log("[ADA] $where: " . $e->getMessage());
+    json_error(500, 'Something went wrong on the server. Please try again.');
 }

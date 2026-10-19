@@ -12,10 +12,19 @@
 
   var HOME_COUNT = 3;
 
+  // Escapes text for HTML, including inside attribute values ("…").
   function escapeHtml(str) {
-    var div = document.createElement("div");
-    div.textContent = str || "";
-    return div.innerHTML;
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  // Only web, mail and phone links (or this site's own paths) may become an
+  // href/src; anything else (javascript:, data:, ...) is replaced with "#".
+  function safeUrl(url) {
+    var u = String(url == null ? "" : url).trim();
+    if (/^(https?:|mailto:|tel:)/i.test(u) || /^(\/(?!\/)|\.{1,2}\/|[\w\-.~%]+(\/|\?|#|$))/.test(u) && u.indexOf(":") === -1) return u;
+    return "#";
   }
 
   function formatDate(value) {
@@ -30,7 +39,7 @@
 
   function cover(m) {
     if (m.cover_image) {
-      return '<img src="' + escapeHtml(m.cover_image) + '" alt="Cover of ' + escapeHtml(m.title) + '" loading="lazy">';
+      return '<img src="' + escapeHtml(safeUrl(m.cover_image)) + '" alt="Cover of ' + escapeHtml(m.title) + '" loading="lazy">';
     }
     return (
       '<span class="magazine-cover-ph">' +
@@ -43,7 +52,7 @@
 
   function magazineCard(m) {
     // PDFs open in the browser's own viewer; file_url is served by api/media.php.
-    var url = escapeHtml(m.file_url);
+    var url = escapeHtml(safeUrl(m.file_url));
     var fileName = escapeHtml(((m.title || "magazine").replace(/[^\w\- ]+/g, "").trim() || "magazine") + ".pdf");
     // The issue label ("October 2026 · Vol. 3") already dates it; fall back to the upload date.
     var meta = escapeHtml(m.issue || formatDate(m.created_at));

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Account — ADA Law Chambers Admin</title>
+<link rel="icon" href="../assets/images/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="../index.html" class="brand">
+      <img src="../assets/images/logo-320.webp" alt="ADA Law Chambers crest">
+      <span class="brand-text"><strong>ADA Law Chambers</strong><span>Admin Panel</span></span>
+    </a>
+    <nav class="admin-nav">
+      <a href="dashboard.html">Rules &amp; Thoughts</a>
+      <a href="editor.html">New Post</a>
+      <a href="articles.html">Articles</a>
+      <a href="magazines.html">Magazines</a>
+      <a href="links.html">Important Links</a>
+      <a href="resources.html">Resources</a>
+      <a href="messages.html">Messages</a>
+      <a href="applications.html">Applications</a>
+      <a href="account.html" class="active">Account</a>
+      <a href="../index.html">View Website</a>
+    </nav>
+    <div>
+      <p style="font-size:.78rem;color:rgba(244,233,201,.7);margin-bottom:.5rem;" id="admin-user-label"></p>
+      <button class="btn btn--outline btn--sm btn--full" data-logout>Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topline">
+      <div>
+        <h1 style="margin-bottom:.2rem;font-size:1.6rem;">Account</h1>
+        <p style="margin:0;color:var(--ink-500);font-size:.9rem;">Change the password you sign in with. Use at least 12 characters — a few unrelated words work well.</p>
+      </div>
+    </div>
+
+    <form class="admin-card" id="password-form" autocomplete="on">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="pw-current">Current password</label>
+          <input id="pw-current" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="field">
+          <label for="pw-new">New password (min. 12 characters)</label>
+          <input id="pw-new" type="password" autocomplete="new-password" minlength="12" maxlength="200" required>
+        </div>
+        <div class="field">
+          <label for="pw-confirm">Repeat new password</label>
+          <input id="pw-confirm" type="password" autocomplete="new-password" minlength="12" maxlength="200" required>
+        </div>
+      </div>
+      <div class="alert" id="password-status" hidden role="status"></div>
+      <div style="margin-top:1.25rem;">
+        <button class="btn btn--gold" type="submit" id="password-save-btn">Change Password</button>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script src="../js/api-config.js"></script>
+<script src="../js/hostinger-client.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

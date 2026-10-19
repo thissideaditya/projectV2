@@ -20,10 +20,19 @@
     { name: "CA Ravish Barahia", role: "CONSULTANT", img: "/assets/images/ravishImage.webp" },
   ];
 
+  // Escapes text for HTML, including inside attribute values ("…").
   function escapeHtml(str) {
-    var div = document.createElement("div");
-    div.textContent = str || "";
-    return div.innerHTML;
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  // Only web, mail and phone links (or this site's own paths) may become an
+  // href/src; anything else (javascript:, data:, ...) is replaced with "#".
+  function safeUrl(url) {
+    var u = String(url == null ? "" : url).trim();
+    if (/^(https?:|mailto:|tel:)/i.test(u) || /^(\/(?!\/)|\.{1,2}\/|[\w\-.~%]+(\/|\?|#|$))/.test(u) && u.indexOf(":") === -1) return u;
+    return "#";
   }
 
   function render() {
@@ -35,7 +44,7 @@
     mount.innerHTML = list.map(function (e) {
       return (
         '<div class="team-card">' +
-          '<div class="team-photo"><img src="' + e.img + '" alt="' + escapeHtml(e.name) + '" loading="lazy"></div>' +
+          '<div class="team-photo"><img src="' + escapeHtml(safeUrl(e.img)) + '" alt="' + escapeHtml(e.name) + '" loading="lazy"></div>' +
           '<div class="team-info"><h3>' + escapeHtml(e.name) + '</h3><span class="role">' + escapeHtml(e.role) + '</span></div>' +
         '</div>'
       );

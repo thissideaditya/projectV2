@@ -33,8 +33,9 @@ if ($method === 'GET') {
         require_admin();
 
         if (isset($_GET['id'])) {
+            $id = query_id();
             $stmt = $pdo->prepare('SELECT * FROM magazines WHERE id = ?');
-            $stmt->execute([$_GET['id']]);
+            $stmt->execute([$id]);
             $magazine = $stmt->fetch();
             json_ok(['magazine' => $magazine ?: null]);
         }
@@ -101,8 +102,7 @@ if ($method === 'POST') {
 // ---------------------------------------------------------------
 if ($method === 'PUT') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $body = json_body();
     $fields = [];
@@ -146,8 +146,7 @@ if ($method === 'PUT') {
 // ---------------------------------------------------------------
 if ($method === 'DELETE') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $stmt = $pdo->prepare('SELECT file_url, cover_image FROM magazines WHERE id = ?');
     $stmt->execute([$id]);
@@ -166,5 +165,5 @@ json_error(405, 'Method not allowed.');
 } catch (PDOException $e) {
     // Common cause: the magazines table hasn't been created yet in this
     // database — see api/schema.sql for the CREATE TABLE block.
-    json_error(500, 'Database error in magazines.php: ' . $e->getMessage());
+    db_failure($e, 'magazines.php');
 }

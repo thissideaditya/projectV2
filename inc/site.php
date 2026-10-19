@@ -34,6 +34,20 @@ function e($str): string
     return htmlspecialchars((string) $str, ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * A URL that is safe to put in href/src: web, mail and phone links and
+ * this site's own paths. Anything else (javascript:, data:, //other-site)
+ * becomes "#". Same rule as safeUrl() in the browser scripts.
+ */
+function site_safe_url($url): string
+{
+    $u = trim((string) $url);
+    $probe = preg_replace('~[\x00-\x20]+~', '', $u);
+    if (preg_match('~^(https?:|mailto:|tel:)~i', $probe)) return $u;
+    if (strpos($probe, ':') === false && preg_match('~^(/(?!/)|\.{1,2}/|[\w\-.~%]+(/|\?|#|$))~', $probe)) return $u;
+    return '#';
+}
+
 /** "2026-10-12 09:30:00" -> "12 October 2026" (same as the scripts' en-IN format). */
 function site_date($value): string
 {
@@ -235,7 +249,7 @@ function site_post_card(array $post): string
     $url = 'post.php?slug=' . rawurlencode($post['slug']);
     return '<article class="post-card">'
         . '<a class="thumb" href="' . e($url) . '">'
-        .   '<img src="' . e($post['cover_image']) . '" alt="' . e($post['title']) . '" loading="lazy">'
+        .   '<img src="' . e(site_safe_url($post['cover_image'])) . '" alt="' . e($post['title']) . '" loading="lazy">'
         . '</a>'
         . '<div class="body">'
         .   '<span class="meta">' . $label . ' | ' . site_date($post['created_at']) . '</span>'
@@ -264,7 +278,7 @@ function site_render_posts(string $html, string $category): string
  */
 function site_post_body(string $html): string
 {
-    return preg_replace('~<(/?)h1(?=[\s>])~i', '<$1h2', $html);
+    return sanitize_post_html($html); // safe HTML only; h1 -> h2 (api/config.php)
 }
 
 // ---- Articles (js/articles-render.js) ----------------------------------
@@ -285,10 +299,10 @@ function site_article_card(array $a): string
     return '<article class="post-card">'
         . '<div class="body">'
         .   '<span class="meta">' . e($typeLabel) . ' &middot; ' . site_date($a['created_at']) . '</span>'
-        .   '<h3><a class="article-title-link" href="' . e($openUrl) . '" target="_blank" rel="noopener noreferrer">' . e($a['title']) . '</a></h3>'
+        .   '<h3><a class="article-title-link" href="' . e(site_safe_url($openUrl)) . '" target="_blank" rel="noopener noreferrer">' . e($a['title']) . '</a></h3>'
         .   ($a['description'] ? '<p>' . e($a['description']) . '</p>' : '')
         .   '<div class="card-actions" style="justify-content:flex-start;">'
-        .     '<a class="btn btn--sm btn--gold" href="' . e($a['file_url']) . '" download="' . e($fileName) . '">Download &darr;</a>'
+        .     '<a class="btn btn--sm btn--gold" href="' . e(site_safe_url($a['file_url'])) . '" download="' . e($fileName) . '">Download &darr;</a>'
         .     site_share_button($a['file_url'], $a['title'])
         .   '</div>'
         . '</div>'
@@ -307,13 +321,13 @@ function site_render_articles(string $html): string
 
 function site_magazine_card(array $m): string
 {
-    $url = $m['file_url'];
+    $url = site_safe_url($m['file_url']);
     $safeTitle = trim(preg_replace('/[^\w\- ]+/', '', (string) $m['title']));
     $fileName = ($safeTitle !== '' ? $safeTitle : 'magazine') . '.pdf';
     $meta = $m['issue'] ?: site_date($m['created_at']);
 
     if ($m['cover_image']) {
-        $cover = '<img src="' . e($m['cover_image']) . '" alt="Cover of ' . e($m['title']) . '" loading="lazy">';
+        $cover = '<img src="' . e(site_safe_url($m['cover_image'])) . '" alt="Cover of ' . e($m['title']) . '" loading="lazy">';
     } else {
         $cover = '<span class="magazine-cover-ph">'
                .   '<span class="magazine-cover-brand">ADA Law Chambers</span>'
@@ -352,10 +366,10 @@ function site_link_row(array $l): string
 {
     return '<div class="practice-row">'
         . '<div>'
-        .   '<h3><a href="' . e($l['url']) . '" target="_blank" rel="noopener">' . e($l['title']) . '</a></h3>'
+        .   '<h3><a href="' . e(site_safe_url($l['url'])) . '" target="_blank" rel="noopener">' . e($l['title']) . '</a></h3>'
         .   ($l['description'] ? '<p style="margin:.4rem 0 0;color:var(--ink-700);font-size:.92rem;max-width:60ch;">' . e($l['description']) . '</p>' : '')
         . '</div>'
-        . '<a class="btn btn--sm btn--outline-dark" href="' . e($l['url']) . '" target="_blank" rel="noopener">Visit &rarr;</a>'
+        . '<a class="btn btn--sm btn--outline-dark" href="' . e(site_safe_url($l['url'])) . '" target="_blank" rel="noopener">Visit &rarr;</a>'
         . '</div>';
 }
 

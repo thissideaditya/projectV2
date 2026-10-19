@@ -7,10 +7,19 @@
 (function () {
   "use strict";
 
+  // Escapes text for HTML, including inside attribute values ("…").
   function escapeHtml(str) {
-    var div = document.createElement("div");
-    div.textContent = str || "";
-    return div.innerHTML;
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  // Only web, mail and phone links (or this site's own paths) may become an
+  // href/src; anything else (javascript:, data:, ...) is replaced with "#".
+  function safeUrl(url) {
+    var u = String(url == null ? "" : url).trim();
+    if (/^(https?:|mailto:|tel:)/i.test(u) || /^(\/(?!\/)|\.{1,2}\/|[\w\-.~%]+(\/|\?|#|$))/.test(u) && u.indexOf(":") === -1) return u;
+    return "#";
   }
 
   /* -------------------------------------------------------------
@@ -378,7 +387,7 @@
           return (
             "<tr>" +
               "<td><strong>" + escapeHtml(m.name) + "</strong><br><span style=\"color:var(--ink-500);font-size:.82rem;\">" + escapeHtml(m.email) + (m.phone ? " &middot; " + escapeHtml(m.phone) : "") + "</span></td>" +
-              "<td>" + escapeHtml(m.subject || "&mdash;") + "</td>" +
+              "<td>" + (m.subject ? escapeHtml(m.subject) : "&mdash;") + "</td>" +
               "<td style=\"max-width:340px;white-space:pre-wrap;\">" + escapeHtml(m.message) + "</td>" +
               "<td style=\"white-space:nowrap;\">" + new Date(m.created_at).toLocaleString("en-IN") + "</td>" +
             "</tr>"
@@ -433,9 +442,10 @@
 
       table.innerHTML = list.map(function (a) {
         var typeLabel = a.application_type === "internship" ? "Internship" : "Associate";
-        var details = a.application_type === "internship"
-          ? [a.college, a.study_year, a.duration].filter(Boolean).join(" &middot; ")
-          : [a.bar_enrolment_no, a.years_experience, a.practice_area].filter(Boolean).join(" &middot; ");
+        // Applicant-typed fields: escaped (they come straight from the public Careers form).
+        var details = (a.application_type === "internship"
+          ? [a.college, a.study_year, a.duration]
+          : [a.bar_enrolment_no, a.years_experience, a.practice_area]).filter(Boolean).map(escapeHtml).join(" &middot; ");
 
         var resumeCell = a.resume_path
           ? '<a class="btn btn--sm btn--outline-dark" href="' + window.ADA.data.resumeDownloadUrl(a.id) + '" target="_blank" rel="noopener">Download</a>'
@@ -483,7 +493,7 @@
             "<tr>" +
               "<td>" + l.display_order + "</td>" +
               "<td>" + escapeHtml(l.title) + "</td>" +
-              "<td style=\"max-width:260px;overflow-wrap:anywhere;\"><a href=\"" + escapeHtml(l.url) + "\" target=\"_blank\" rel=\"noopener\">" + escapeHtml(l.url) + "</a></td>" +
+              "<td style=\"max-width:260px;overflow-wrap:anywhere;\"><a href=\"" + escapeHtml(safeUrl(l.url)) + "\" target=\"_blank\" rel=\"noopener\">" + escapeHtml(l.url) + "</a></td>" +
               "<td style=\"white-space:nowrap;\">" +
                 "<button class=\"btn btn--sm btn--outline-dark\" data-edit=\"" + l.id + "\">Edit</button> " +
                 "<button class=\"btn btn--sm btn--danger\" data-delete=\"" + l.id + "\">Delete</button>" +
@@ -583,7 +593,7 @@
               "<td>" + escapeHtml(r.category) + "</td>" +
               "<td>" + escapeHtml(r.subcategory || "") + "</td>" +
               "<td>" + escapeHtml(r.title) + "</td>" +
-              "<td style=\"max-width:220px;overflow-wrap:anywhere;\"><a href=\"" + escapeHtml(r.url) + "\" target=\"_blank\" rel=\"noopener\">" + escapeHtml(r.url) + "</a></td>" +
+              "<td style=\"max-width:220px;overflow-wrap:anywhere;\"><a href=\"" + escapeHtml(safeUrl(r.url)) + "\" target=\"_blank\" rel=\"noopener\">" + escapeHtml(r.url) + "</a></td>" +
               "<td style=\"white-space:nowrap;\">" +
                 "<button class=\"btn btn--sm btn--outline-dark\" data-edit=\"" + r.id + "\">Edit</button> " +
                 "<button class=\"btn btn--sm btn--danger\" data-delete=\"" + r.id + "\">Delete</button>" +
@@ -827,7 +837,7 @@
                 ? '<span class="badge badge--gold">Published</span>'
                 : '<span class="badge">Draft</span>') + "</td>" +
               "<td style=\"white-space:nowrap;\">" +
-                "<a class=\"btn btn--sm btn--outline-dark\" href=\"" + escapeHtml(m.file_url) + "\" target=\"_blank\" rel=\"noopener\">View</a> " +
+                "<a class=\"btn btn--sm btn--outline-dark\" href=\"" + escapeHtml(safeUrl(m.file_url)) + "\" target=\"_blank\" rel=\"noopener\">View</a> " +
                 "<a class=\"btn btn--sm btn--outline-dark\" href=\"magazine-editor.html?id=" + m.id + "\">Edit</a> " +
                 "<button class=\"btn btn--sm btn--danger\" data-delete=\"" + m.id + "\">Delete</button>" +
               "</td>" +
@@ -958,7 +968,44 @@
     });
   }
 
+  /* -------------------------------------------------------------
+     ACCOUNT (admin/account.html) — change password
+  ------------------------------------------------------------- */
+  function initAccount() {
+    var form = document.getElementById("password-form");
+    if (!form) return;
+    var status = document.getElementById("password-status");
+    var btn = document.getElementById("password-save-btn");
+    function show(text, isError) {
+      status.hidden = false;
+      status.textContent = text;
+      status.className = "alert " + (isError ? "error" : "info");
+    }
+
+    requireAuth();
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var current = document.getElementById("pw-current").value;
+      var next = document.getElementById("pw-new").value;
+      var again = document.getElementById("pw-confirm").value;
+      if (next.length < 12) { show("The new password must be at least 12 characters long.", true); return; }
+      if (next !== again) { show("The two new passwords don't match.", true); return; }
+      btn.disabled = true;
+      try {
+        await window.ADA.data.changePassword(current, next);
+        form.reset();
+        show("Password changed. Use the new password next time you sign in.", false);
+      } catch (err) {
+        show(err.message || "Could not change the password.", true);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    initAccount();
     initLoginPage();
     initDashboard();
     initEditor();

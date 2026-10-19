@@ -130,7 +130,7 @@ if ($post) {
         <h1><?php echo h($post['title']); ?></h1>
         <div style="margin-top:1rem;"><?php echo site_share_button($ogUrl, $post['title']); ?></div>
       </header>
-      <img src="<?php echo h($post['cover_image']); ?>" alt="" style="border-radius:6px;margin-bottom:2.5rem;max-height:420px;object-fit:cover;width:100%;">
+      <img src="<?php echo h(site_safe_url($post['cover_image'])); ?>" alt="" style="border-radius:6px;margin-bottom:2.5rem;max-height:420px;object-fit:cover;width:100%;">
       <?php // Admin-authored HTML from the rich-text editor, shown as-is (same as posts-render.js). ?>
       <div class="article-body"><?php echo site_post_body((string) $post['content']); ?></div>
     </div>

@@ -14,7 +14,7 @@
    Requires js/api-config.js to be loaded first.
 =================================================================== */
 
-var CONTACT_RECEIVING_EMAIL = "contact@adalawChambers.com";
+var CONTACT_RECEIVING_EMAIL = "info@ada.org.in";
 
 (function () {
   "use strict";
@@ -36,7 +36,7 @@ var CONTACT_RECEIVING_EMAIL = "contact@adalawChambers.com";
       payload.message;
     var url =
       "mailto:" + CONTACT_RECEIVING_EMAIL +
-      "?subject=" + encodeURIComponent(payload.subject || "Website enquiry") +
+      "?subject=" + encodeURIComponent("Website enquiry") +
       "&body=" + encodeURIComponent(body);
     window.location.href = url;
   }
@@ -51,7 +51,6 @@ var CONTACT_RECEIVING_EMAIL = "contact@adalawChambers.com";
       "Name: " + payload.name + "\n" +
       "Email: " + payload.email + "\n" +
       "Phone: " + (payload.phone || "-") + "\n" +
-      "Subject: " + (payload.subject || "-") + "\n" +
       "Message: " + payload.message;
     var url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text);
     window.open(url, "_blank", "noopener");
@@ -74,7 +73,6 @@ var CONTACT_RECEIVING_EMAIL = "contact@adalawChambers.com";
         name: document.getElementById("c-name").value.trim(),
         email: document.getElementById("c-email").value.trim(),
         phone: document.getElementById("c-phone").value.trim(),
-        subject: document.getElementById("c-subject").value.trim() || "Website enquiry",
         message: document.getElementById("c-message").value.trim(),
         website: document.getElementById("c-website").value, // hidden spam trap, empty for people
         elapsed_ms: Date.now() - openedAt,

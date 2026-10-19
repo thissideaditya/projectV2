@@ -5,6 +5,7 @@
  * POST ?action=login   { email, password }  -> logs in, sets a session
  * POST ?action=logout                       -> logs out
  * GET  ?action=check                        -> returns current session, if any
+ * POST ?action=change_password { current_password, new_password }  (signed in)
  * ---------------------------------------------------------------
  */
 
@@ -21,13 +22,6 @@ $action = $_GET['action'] ?? '';
 const LOGIN_WINDOW = 15 * 60;
 const LOGIN_MAX_PER_VISITOR = 5;
 const LOGIN_MAX_PER_ACCOUNT = 20;
-
-function login_client_ip(): string
-{
-    // Behind Hostinger's CDN the visitor's address is the first X-Forwarded-For entry.
-    $fwd = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '')[0]);
-    return filter_var($fwd, FILTER_VALIDATE_IP) ? $fwd : ($_SERVER['REMOTE_ADDR'] ?? 'unknown');
-}
 
 function login_bucket_file(string $key): string
 {
@@ -58,14 +52,14 @@ function login_clear(string $key): void
 
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = json_body();
-    $email = trim($body['email'] ?? '');
-    $password = $body['password'] ?? '';
+    $email = is_string($body['email'] ?? null) ? trim($body['email']) : '';
+    $password = is_string($body['password'] ?? null) ? $body['password'] : '';
 
     if (!$email || !$password) {
         json_error(400, 'Email and password are required.');
     }
 
-    $ipKey = 'ip:' . login_client_ip();
+    $ipKey = 'ip:' . client_ip();
     $accountKey = 'acct:' . strtolower($email);
     $ipFails = login_failures($ipKey);
     $accountFails = login_failures($accountKey);
@@ -87,19 +81,71 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     login_clear($ipKey);
     login_clear($accountKey);
+
+    // Hashes made with older settings are upgraded to the current default.
+    if (password_needs_rehash($admin['password_hash'], PASSWORD_DEFAULT)) {
+        $up = db()->prepare('UPDATE admins SET password_hash = ? WHERE id = ?');
+        $up->execute([password_hash($password, PASSWORD_DEFAULT), $admin['id']]);
+    }
+
     // New session id on sign-in, so a session id from before login can't be reused.
     session_regenerate_id(true);
 
     $_SESSION['admin_id'] = $admin['id'];
     $_SESSION['admin_email'] = $admin['email'];
+    $_SESSION['signed_in_at'] = time();
+    $_SESSION['last_seen'] = time();
 
     json_ok(['user' => ['email' => $admin['email']]]);
 }
 
-if ($action === 'logout') {
+if ($action === 'logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $p = session_get_cookie_params();
+        setcookie(session_name(), '', ['expires' => time() - 3600, 'path' => $p['path'], 'secure' => $p['secure'], 'httponly' => true, 'samesite' => 'Lax']);
+    }
     session_destroy();
     json_ok();
+}
+
+// Change the signed-in admin's password. Needs the current password (so a
+// left-open session alone can't lock the owner out) and a new one of at
+// least 12 characters.
+if ($action === 'change_password' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_admin();
+    $body = json_body();
+    $current = is_string($body['current_password'] ?? null) ? $body['current_password'] : '';
+    $new = is_string($body['new_password'] ?? null) ? $body['new_password'] : '';
+
+    $key = 'pw:' . $_SESSION['admin_id'];
+    if (count(login_failures($key)) >= LOGIN_MAX_PER_VISITOR) {
+        json_error(429, 'Too many wrong current passwords. Please try again in 15 minutes.');
+    }
+
+    $stmt = db()->prepare('SELECT id, password_hash FROM admins WHERE id = ?');
+    $stmt->execute([$_SESSION['admin_id']]);
+    $admin = $stmt->fetch();
+    if (!$admin || !password_verify($current, $admin['password_hash'])) {
+        login_record_failure($key);
+        json_error(400, 'Your current password is not correct.');
+    }
+    $len = function_exists('mb_strlen') ? mb_strlen($new, 'UTF-8') : strlen($new);
+    if ($len < 12) {
+        json_error(400, 'The new password must be at least 12 characters long.');
+    }
+    if ($len > 200) {
+        json_error(400, 'The new password is too long (max 200 characters).');
+    }
+    if (password_verify($new, $admin['password_hash'])) {
+        json_error(400, 'The new password must be different from the current one.');
+    }
+
+    $up = db()->prepare('UPDATE admins SET password_hash = ? WHERE id = ?');
+    $up->execute([password_hash($new, PASSWORD_DEFAULT), $admin['id']]);
+    login_clear($key);
+    session_regenerate_id(true);
+    json_ok(['message' => 'Password changed.']);
 }
 
 if ($action === 'check') {

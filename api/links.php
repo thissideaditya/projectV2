@@ -55,8 +55,7 @@ if ($method === 'POST') {
 
 if ($method === 'PUT') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $body = json_body();
     $fields = [];
@@ -81,8 +80,7 @@ if ($method === 'PUT') {
 
 if ($method === 'DELETE') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $stmt = $pdo->prepare('DELETE FROM important_links WHERE id = ?');
     $stmt->execute([$id]);
@@ -94,5 +92,5 @@ json_error(405, 'Method not allowed.');
 } catch (PDOException $e) {
     // Common cause: the important_links table hasn't been created yet
     // in this database — see api/schema.sql for the CREATE TABLE block.
-    json_error(500, 'Database error in links.php: ' . $e->getMessage());
+    db_failure($e, 'links.php');
 }

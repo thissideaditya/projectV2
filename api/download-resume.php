@@ -14,10 +14,7 @@
 require __DIR__ . '/config.php';
 require_admin();
 
-$id = $_GET['id'] ?? null;
-if (!$id) {
-    json_error(400, 'Missing ?id=.');
-}
+$id = query_id();
 
 $stmt = db()->prepare('SELECT resume_path, resume_original_name FROM career_applications WHERE id = ?');
 $stmt->execute([$id]);
@@ -48,7 +45,9 @@ $mime = $ext === 'pdf'
 $downloadName = $row['resume_original_name'] ?: $filename;
 
 header('Content-Type: ' . $mime);
-header('Content-Disposition: attachment; filename="' . str_replace('"', '', $downloadName) . '"');
+// ASCII fallback name plus the exact (UTF-8) name, with nothing that could break the header.
+$asciiName = preg_replace('~[^A-Za-z0-9 ._()\-]+~', '_', $downloadName);
+header("Content-Disposition: attachment; filename=\"$asciiName\"; filename*=UTF-8''" . rawurlencode($downloadName));
 header('Content-Length: ' . filesize($filePath));
 header('X-Content-Type-Options: nosniff');
 readfile($filePath);

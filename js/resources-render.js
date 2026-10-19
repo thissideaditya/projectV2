@@ -7,20 +7,29 @@
 (function () {
   "use strict";
 
+  // Escapes text for HTML, including inside attribute values ("…").
   function escapeHtml(str) {
-    var div = document.createElement("div");
-    div.textContent = str || "";
-    return div.innerHTML;
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  // Only web, mail and phone links (or this site's own paths) may become an
+  // href/src; anything else (javascript:, data:, ...) is replaced with "#".
+  function safeUrl(url) {
+    var u = String(url == null ? "" : url).trim();
+    if (/^(https?:|mailto:|tel:)/i.test(u) || /^(\/(?!\/)|\.{1,2}\/|[\w\-.~%]+(\/|\?|#|$))/.test(u) && u.indexOf(":") === -1) return u;
+    return "#";
   }
 
   function resourceRow(r) {
     return (
       '<div class="practice-row">' +
         "<div>" +
-          '<h3><a href="' + escapeHtml(r.url) + '" target="_blank" rel="noopener">' + escapeHtml(r.title) + "</a></h3>" +
+          '<h3><a href="' + escapeHtml(safeUrl(r.url)) + '" target="_blank" rel="noopener">' + escapeHtml(r.title) + "</a></h3>" +
           (r.description ? '<p style="margin:.4rem 0 0;color:var(--ink-700);font-size:.92rem;max-width:60ch;">' + escapeHtml(r.description) + "</p>" : "") +
         "</div>" +
-        '<a class="btn btn--sm btn--outline-dark" href="' + escapeHtml(r.url) + '" target="_blank" rel="noopener">Visit &rarr;</a>' +
+        '<a class="btn btn--sm btn--outline-dark" href="' + escapeHtml(safeUrl(r.url)) + '" target="_blank" rel="noopener">Visit &rarr;</a>' +
       "</div>"
     );
   }

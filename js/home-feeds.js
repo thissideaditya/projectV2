@@ -17,10 +17,19 @@
   var BASE = (typeof API_BASE_URL !== "undefined" ? API_BASE_URL : "/api");
   var SHOW = 3;
 
+  // Escapes text for HTML, including inside attribute values ("…").
   function escapeHtml(str) {
-    var div = document.createElement("div");
-    div.textContent = str || "";
-    return div.innerHTML;
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  // Only web, mail and phone links (or this site's own paths) may become an
+  // href/src; anything else (javascript:, data:, ...) is replaced with "#".
+  function safeUrl(url) {
+    var u = String(url == null ? "" : url).trim();
+    if (/^(https?:|mailto:|tel:)/i.test(u) || /^(\/(?!\/)|\.{1,2}\/|[\w\-.~%]+(\/|\?|#|$))/.test(u) && u.indexOf(":") === -1) return u;
+    return "#";
   }
 
   function formatDate(iso) {
@@ -34,11 +43,11 @@
 
   // Picture = the article's own share image (og:image), read from the article page by the API.
   function articleCard(a) {
-    var url = escapeHtml(a.url);
+    var url = escapeHtml(safeUrl(a.url));
     return (
       '<article class="post-card feed-card">' +
         (a.image ? '<a class="feed-thumb" href="' + url + '" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">' +
-                   '<img src="' + escapeHtml(a.image) + '" alt="" loading="lazy"></a>' : "") +
+                   '<img src="' + escapeHtml(safeUrl(a.image)) + '" alt="" loading="lazy"></a>' : "") +
         '<div class="feed-body">' +
           '<span class="feed-meta">gstindia.biz &middot; ' + formatDate(a.date) + "</span>" +
           '<h3><a href="' + url + '" target="_blank" rel="noopener">' + escapeHtml(a.title) + "</a></h3>" +
@@ -57,8 +66,8 @@
   // Picture = the video's YouTube thumbnail (from the API).
   function videoCard(v) {
     return (
-      '<a class="video-card feed-card" href="' + escapeHtml(v.url) + '" target="_blank" rel="noopener">' +
-        '<span class="feed-thumb"><img src="' + escapeHtml(v.thumbnail) + '" alt="" loading="lazy"><span class="video-play" aria-hidden="true"></span></span>' +
+      '<a class="video-card feed-card" href="' + escapeHtml(safeUrl(v.url)) + '" target="_blank" rel="noopener">' +
+        '<span class="feed-thumb"><img src="' + escapeHtml(safeUrl(v.thumbnail)) + '" alt="" loading="lazy"><span class="video-play" aria-hidden="true"></span></span>' +
         '<span class="feed-body"><span class="feed-meta">YouTube &middot; ' + formatDate(v.date) + "</span>" +
         "<h3>" + escapeHtml(videoTitle(v.title)) + "</h3>" +
         '<span class="feed-more">Watch on YouTube' + ARROW + "</span></span>" +

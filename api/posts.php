@@ -20,6 +20,15 @@
 require __DIR__ . '/config.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
+
+/** Post rows go out with their HTML made safe (see sanitize_post_html in config.php). */
+function clean_post($post)
+{
+    if (is_array($post) && array_key_exists('content', $post)) {
+        $post['content'] = sanitize_post_html($post['content']);
+    }
+    return $post;
+}
 $pdo = db();
 
 // ---------------------------------------------------------------
@@ -32,32 +41,33 @@ if ($method === 'GET') {
         require_admin();
 
         if (isset($_GET['id'])) {
+            $id = query_id();
             $stmt = $pdo->prepare('SELECT * FROM posts WHERE id = ?');
-            $stmt->execute([$_GET['id']]);
+            $stmt->execute([$id]);
             $post = $stmt->fetch();
-            json_ok(['post' => $post ?: null]);
+            json_ok(['post' => $post ? clean_post($post) : null]);
         }
 
-        if (!empty($_GET['category'])) {
+        if (query_str('category') !== '') {
             $stmt = $pdo->prepare('SELECT * FROM posts WHERE category = ? ORDER BY created_at DESC');
-            $stmt->execute([$_GET['category']]);
+            $stmt->execute([query_str('category')]);
         } else {
             $stmt = $pdo->query('SELECT * FROM posts ORDER BY created_at DESC');
         }
-        json_ok(['posts' => $stmt->fetchAll()]);
+        json_ok(['posts' => array_map('clean_post', $stmt->fetchAll())]);
     }
 
-    if (!empty($_GET['slug'])) {
+    if (query_str('slug') !== '') {
         $stmt = $pdo->prepare("SELECT * FROM posts WHERE slug = ? AND status = 'published'");
-        $stmt->execute([$_GET['slug']]);
+        $stmt->execute([query_str('slug')]);
         $post = $stmt->fetch();
-        json_ok(['post' => $post ?: null]);
+        json_ok(['post' => $post ? clean_post($post) : null]);
     }
 
-    if (!empty($_GET['category'])) {
+    if (query_str('category') !== '') {
         $stmt = $pdo->prepare("SELECT * FROM posts WHERE category = ? AND status = 'published' ORDER BY created_at DESC");
-        $stmt->execute([$_GET['category']]);
-        json_ok(['posts' => $stmt->fetchAll()]);
+        $stmt->execute([query_str('category')]);
+        json_ok(['posts' => array_map('clean_post', $stmt->fetchAll())]);
     }
 
     json_error(400, 'Provide ?category= or ?slug= (or ?all=1 as an admin).');
@@ -97,7 +107,7 @@ if ($method === 'POST') {
         $title,
         $slug,
         $body['excerpt'] ?? '',
-        $body['content'] ?? '',
+        sanitize_post_html($body['content'] ?? ''),
         $body['cover_image'] ?? '',
         in_array($body['status'] ?? '', ['draft', 'published'], true) ? $body['status'] : 'draft',
     ]);
@@ -105,7 +115,7 @@ if ($method === 'POST') {
     $id = $pdo->lastInsertId();
     $stmt = $pdo->prepare('SELECT * FROM posts WHERE id = ?');
     $stmt->execute([$id]);
-    json_ok(['post' => $stmt->fetch()], 201);
+    json_ok(['post' => clean_post($stmt->fetch())], 201);
 }
 
 // ---------------------------------------------------------------
@@ -113,8 +123,7 @@ if ($method === 'POST') {
 // ---------------------------------------------------------------
 if ($method === 'PUT') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $body = json_body();
     $fields = [];
@@ -123,7 +132,7 @@ if ($method === 'PUT') {
     foreach (['title', 'category', 'excerpt', 'content', 'cover_image', 'status'] as $col) {
         if (array_key_exists($col, $body)) {
             $fields[] = "$col = ?";
-            $values[] = $body[$col];
+            $values[] = $col === 'content' ? sanitize_post_html($body[$col]) : $body[$col];
         }
     }
     // The slug is the post's address (post.php?slug=...). It is set once, when
@@ -147,7 +156,7 @@ if ($method === 'PUT') {
 
     $stmt = $pdo->prepare('SELECT * FROM posts WHERE id = ?');
     $stmt->execute([$id]);
-    json_ok(['post' => $stmt->fetch()]);
+    json_ok(['post' => clean_post($stmt->fetch())]);
 }
 
 // ---------------------------------------------------------------
@@ -155,8 +164,7 @@ if ($method === 'PUT') {
 // ---------------------------------------------------------------
 if ($method === 'DELETE') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $stmt = $pdo->prepare('SELECT cover_image FROM posts WHERE id = ?');
     $stmt->execute([$id]);

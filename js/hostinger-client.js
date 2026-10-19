@@ -99,6 +99,16 @@
       return body.user;
     },
 
+    /** Change the signed-in admin's password (needs the current one). */
+    async changePassword(currentPassword, newPassword) {
+      var body = await request("/auth.php?action=change_password", {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+      });
+      return body.message;
+    },
+
     async signOut() {
       await request("/auth.php?action=logout", { method: "POST" });
     },

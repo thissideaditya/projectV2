@@ -61,8 +61,7 @@ if ($method === 'POST') {
 
 if ($method === 'PUT') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $body = json_body();
     $fields = [];
@@ -93,8 +92,7 @@ if ($method === 'PUT') {
 
 if ($method === 'DELETE') {
     require_admin();
-    $id = $_GET['id'] ?? null;
-    if (!$id) json_error(400, 'Missing ?id=.');
+    $id = query_id();
 
     $stmt = $pdo->prepare('DELETE FROM resources WHERE id = ?');
     $stmt->execute([$id]);
@@ -106,5 +104,5 @@ json_error(405, 'Method not allowed.');
 } catch (PDOException $e) {
     // Common cause: the resources table hasn't been created yet in this
     // database — see api/schema.sql for the CREATE TABLE block.
-    json_error(500, 'Database error in resources.php: ' . $e->getMessage());
+    db_failure($e, 'resources.php');
 }
