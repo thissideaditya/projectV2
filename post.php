@@ -49,7 +49,8 @@ if ($post) {
     $ogTitle   = $post['title'];
     $ogDesc    = $post['excerpt'] !== '' ? $post['excerpt'] : 'Read this article from ' . $siteName . '.';
 
-    $cover = $post['cover_image'];
+    // Only a safe web/relative address may become the share image.
+    $cover = site_safe_url($post['cover_image']) === '#' ? '' : $post['cover_image'];
     if ($cover && preg_match('~^https?://~i', $cover)) {
         $ogImage = $cover; // already a full URL
     } elseif ($cover) {

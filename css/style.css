@@ -139,7 +139,19 @@ body.disclaimer-active > *:not(.disclaimer-overlay) { filter: blur(6px); }
 .disclaimer-card .crest { width: 7rem; }
 .disclaimer-card h2 { font-size: 1.4rem; margin-bottom: .75rem; }
 .disclaimer-card p { font-size: .93rem; color: var(--ink-700); }
-.disclaimer-actions { margin: .25rem 0 1.5rem; text-align: center; }
+.disclaimer-actions { margin: .25rem 0 1rem; text-align: center; }
+/* "Scroll to read more": the card ends just below this line (height set in
+   js/main.js), so the text after it is out of view until the card is scrolled. */
+.disclaimer-card { position: relative; scroll-behavior: smooth; }
+.disclaimer-scroll-hint {
+  margin: 0 0 1.25rem; text-align: center; font-family: "Inter", sans-serif;
+  font-size: .78rem !important; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--gold-700) !important; transition: opacity .3s var(--ease);
+}
+.disclaimer-scroll-arrow { display: inline-block; margin-left: .3rem; animation: disclaimer-nudge 1.4s ease-in-out infinite; }
+@keyframes disclaimer-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+.disclaimer-card.is-scrolled .disclaimer-scroll-hint { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .disclaimer-scroll-arrow { animation: none; } }
 
 /* ---------------------------------------------------------------
    HEADER / NAV
@@ -1374,20 +1386,30 @@ body.disclaimer-active .floating-contact { display: none; }
 }
 
 @media (max-width: 760px) {
+  /* Closed, the panel stays in place and is clipped away from the left
+     (it used to sit off-screen to the right, which made every page 710px
+     wide on phones and let it be dragged sideways). visibility keeps the
+     hidden links out of keyboard focus; it switches only after the wipe. */
   .main-nav { position: fixed; top: 0; right: 0; bottom: 0; width: min(320px, 82vw);
     background: var(--cream-50); box-shadow: -12px 0 40px -18px rgba(0,0,0,.4);
-    transform: translateX(100%); transition: transform .3s var(--ease);
-    /* overflow-x: hidden; */
+    clip-path: inset(0 0 0 100%); visibility: hidden;
+    transition: clip-path .3s var(--ease), visibility 0s linear .3s;
     padding: 5.5rem 1.75rem 2rem; overflow-y: auto; z-index: 600;
   }
-  .main-nav.open { transform: translateX(0); }
+  .main-nav.open { clip-path: inset(0 0 0 -60px); visibility: visible; transition: clip-path .3s var(--ease), visibility 0s; }
   
   .main-nav ul { flex-direction: column; align-items: flex-start; gap: .3rem; width: 100%; }
   .main-nav ul li { width: 100%; }
   .main-nav a { display: block; padding: .8rem 0; width: 100%; }
   .has-dropdown .dropdown { position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none; border: none; padding-left: .75rem; display: none; }
   .has-dropdown.open .dropdown { display: block; }
-  .nav-toggle { display: flex; }
+  .nav-toggle { display: flex; position: relative; z-index: 610; } /* stays above the open menu panel (z 600) */
+  /* Open menu: the three bars become a ✕ so the panel can be closed. */
+  .nav-toggle span { transition: transform .25s var(--ease), opacity .2s var(--ease); }
+  .nav-toggle[aria-expanded="true"] span { background: var(--green-950); }
+  .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
   .site-header .container { height: auto; padding: .75rem 1rem; }
   .brand img { height: 4.5rem; width: 4.5rem; }
   .brand-text strong { font-size: 0.75rem; }

@@ -61,6 +61,28 @@
     document.body.classList.add("disclaimer-active");
     overlay.hidden = false;
 
+    // Show the card only down to "Scroll to read more"; the rest of the
+    // disclaimer is reached by scrolling inside the card. Never taller than
+    // 88% of the screen (the CSS limit), so small phones still fit.
+    var card = overlay.querySelector(".disclaimer-card");
+    var hint = overlay.querySelector(".disclaimer-scroll-hint");
+    if (card && hint) {
+      var fitCard = function () {
+        card.style.maxHeight = "";
+        var cs = getComputedStyle(card);
+        var limit = hint.offsetTop + hint.offsetHeight + (parseFloat(cs.paddingBottom) || 0) * 0.5;
+        card.style.maxHeight = Math.min(limit, window.innerHeight * 0.88) + "px";
+      };
+      fitCard();
+      window.addEventListener("resize", fitCard);
+      // Logo image loads after layout and pushes the hint down: refit then.
+      var crest = card.querySelector("img");
+      if (crest && !crest.complete) crest.addEventListener("load", fitCard);
+      card.addEventListener("scroll", function () {
+        card.classList.toggle("is-scrolled", card.scrollTop > 8);
+      }, { passive: true });
+    }
+
     var agreeBtn = document.getElementById("disclaimer-agree");
     if (agreeBtn) {
       agreeBtn.addEventListener("click", function () {
