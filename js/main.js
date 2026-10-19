@@ -417,13 +417,18 @@ document.addEventListener("ada:partials-loaded", function () {
   // cursor (they move while animating) must not steal the focus, or
   // neighbours would flip back and forth.
   var queued = false, lastTarget = null;
+  // While a Share menu is open (js/share.js), the card it belongs to stays
+  // focused: the pointer is over the menu's click-blocking layer, which would
+  // otherwise read as "left the grid" and shrink the card back.
+  function sharing() { return document.documentElement.classList.contains("share-open"); }
   document.addEventListener("pointermove", function (e) {
-    if (e.pointerType !== "mouse" || touchy.matches) return;
+    if (e.pointerType !== "mouse" || touchy.matches || sharing()) return;
     lastTarget = e.target;
     if (queued) return;
     queued = true;
     requestAnimationFrame(function () {
       queued = false;
+      if (sharing()) return;
       var r = resolve(lastTarget);
       if (r) activate(r);
       else if (current && !current.grid.contains(lastTarget)) clear();
@@ -431,7 +436,7 @@ document.addEventListener("ada:partials-loaded", function () {
   }, { passive: true });
   // Pointer left the window
   document.addEventListener("mouseout", function (e) {
-    if (!touchy.matches && !e.relatedTarget) clear();
+    if (!touchy.matches && !e.relatedTarget && !sharing()) clear();
   });
 
   // Keyboard: tabbing into a card expands it too.

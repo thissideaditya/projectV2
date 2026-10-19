@@ -69,6 +69,8 @@
   var menu = null;
   var backdrop = null;
   var activeBtn = null;
+  var activeCard = null; // card the open menu belongs to — kept looking focused
+  var CARD = ".post-card, .feed-card, .card, .pa-card, .svc-card, .video-card";
   var copyLabel = null;
 
   function buildMenu() {
@@ -111,6 +113,10 @@
     if (!menu || menu.hidden) return;
     menu.hidden = true;
     backdrop.hidden = true;
+    // "share-open" pauses the card focus-expand in main.js while the menu is up.
+    document.documentElement.classList.remove("share-open");
+    if (activeCard) activeCard.classList.remove("is-sharing");
+    activeCard = null;
     if (activeBtn) activeBtn.setAttribute("aria-expanded", "false");
     activeBtn = null;
     copyLabel.textContent = "Copy link";
@@ -132,6 +138,9 @@
     copyLabel.textContent = "Copy link";
     menu.hidden = false;
     backdrop.hidden = false;
+    document.documentElement.classList.add("share-open");
+    activeCard = btn.closest ? btn.closest(CARD) : null;
+    if (activeCard) activeCard.classList.add("is-sharing");
     btn.setAttribute("aria-expanded", "true");
     activeBtn = btn;
 

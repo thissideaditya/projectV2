@@ -1773,7 +1773,7 @@ body.disclaimer-active .floating-contact { display: none; }
   box-shadow: 0 20px 40px -32px rgba(11, 33, 24, .55);
   transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
 }
-.feed-card:hover { transform: translateY(-4px); border-color: rgba(201, 162, 39, .45); box-shadow: 0 28px 46px -30px rgba(11, 33, 24, .6); }
+.feed-card:hover, .feed-card.is-sharing { transform: translateY(-4px); border-color: rgba(201, 162, 39, .45); box-shadow: 0 28px 46px -30px rgba(11, 33, 24, .6); }
 .feed-thumb { position: relative; display: block; aspect-ratio: 1200 / 630; overflow: hidden; background: var(--cream-100); }
 .video-card .feed-thumb { aspect-ratio: 16 / 9; background: var(--green-950); }
 .feed-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
@@ -1793,7 +1793,7 @@ body.disclaimer-active .floating-contact { display: none; }
   border: 1.5px solid var(--gold-500); background: #fbf2d8; color: var(--green-950);
   transition: background .25s var(--ease), transform .25s var(--ease);
 }
-.feed-card:hover .feed-arrow { background: var(--gold-500); transform: translateX(3px); }
+.feed-card:hover .feed-arrow, .feed-card.is-sharing .feed-arrow { background: var(--gold-500); transform: translateX(3px); }
 .feed-cta { margin-top: 2.5rem; }
 .feed-btn { display: inline-flex; align-items: center; gap: .8rem; padding: .95rem 2rem; }
 .feed-btn span { transition: transform .25s var(--ease); }
@@ -1829,7 +1829,7 @@ body.disclaimer-active .floating-contact { display: none; }
   background: var(--green-950); border-bottom: 1px solid rgba(201, 162, 39, .3);
 }
 .magazine-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
-.feed-card:hover .magazine-cover img { transform: scale(1.04); }
+.feed-card:hover .magazine-cover img, .feed-card.is-sharing .magazine-cover img { transform: scale(1.04); }
 .magazine-cover-ph {
   position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 1rem;
   padding: 2rem 1.75rem; text-align: center; color: #f4e9c9;
