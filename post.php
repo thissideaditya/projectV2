@@ -103,8 +103,8 @@ if ($post) {
 <meta name="twitter:description" content="<?php echo h($ogDesc); ?>">
 <meta name="twitter:image" content="<?php echo h($ogImage); ?>">
 
-<link rel="icon" href="assets/images/favicon-32.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png">
+<link rel="icon" href="assets/images/favicon.jpg" type="image/jpeg" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/images/apple-touch-icon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&family=Libertinus+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Merriweather:wght@400;700&family=Lora:wght@400;600;700&family=PT+Serif:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">

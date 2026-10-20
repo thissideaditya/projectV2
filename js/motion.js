@@ -41,7 +41,7 @@
     if (reduced || !revealObserver) return;
     var nodes = (root || document).querySelectorAll(REVEAL_SELECTORS);
     nodes.forEach(function (el) {
-      if (el.dataset.revealed || el.closest(".disclaimer-overlay, .site-header, .gst-ticker, .floating-contact, .stats-band")) return; // .stats-band: js/stats-band.js
+      if (el.dataset.revealed || el.closest(".disclaimer-overlay, .site-header, .gst-ticker, .floating-contact, .stats-band, .px-why.is-armed")) return; // .stats-band: js/stats-band.js; .px-why: initWhy
       // Skip children of an element already being revealed (avoid double fades)
       var p = el.parentElement;
       while (p) { if (p.classList && p.classList.contains("reveal")) return; p = p.parentElement; }
@@ -108,11 +108,14 @@
      4. FLOATING GST SYMBOLS
      Drift continuously (CSS) and are nudged away from the cursor (JS).
   --------------------------------------------------------------- */
+  // Practice words are mixed in between the symbols, and each section starts
+  // at a random point in this list, so every word appears across the site.
   var SYMBOLS = [
-    { t: "₹", s: 3.2 }, { t: "%", s: 3 }, { t: "GST", s: 2.6, mono: 1 }, { t: "18%", s: 2.4 },
-    { t: "ITC", s: 2.4, mono: 1 }, { t: "§", s: 3 }, { t: "IGST", s: 2.6, mono: 1 }, { t: "5%", s: 2.2 },
-    { t: "HSN", s: 2.4, mono: 1 }, { t: "₹", s: 2.2 }, { t: "CGST", s: 2.6, mono: 1 }, { t: "SGST", s: 2.6, mono: 1 },
-    { t: "40%", s: 2.2 }, { t: "%", s: 2 }
+    { t: "₹", s: 3.2 }, { t: "Appeal", s: 1.7 }, { t: "GST", s: 2.6, mono: 1 }, { t: "Litigation", s: 1.6 },
+    { t: "18%", s: 2.4 }, { t: "GSTAT", s: 2.4, mono: 1 }, { t: "ITC", s: 2.4, mono: 1 }, { t: "High Court", s: 1.6 },
+    { t: "§", s: 3 }, { t: "GST Consultancy", s: 1.4 }, { t: "IGST", s: 2.6, mono: 1 }, { t: "Supreme Court", s: 1.5 },
+    { t: "5%", s: 2.2 }, { t: "HSN", s: 2.4, mono: 1 }, { t: "Appeal", s: 1.5 }, { t: "CGST", s: 2.6, mono: 1 },
+    { t: "Litigation", s: 1.4 }, { t: "SGST", s: 2.6, mono: 1 }, { t: "40%", s: 2.2 }, { t: "%", s: 2 }
   ];
   var floaterSets = [];
 
@@ -126,11 +129,13 @@
     layer.className = "gst-floaters";
     layer.setAttribute("aria-hidden", "true");
     var items = [];
+    var start = Math.floor(Math.random() * SYMBOLS.length);
     for (var i = 0; i < count; i++) {
-      var sym = SYMBOLS[i % SYMBOLS.length];
+      var sym = SYMBOLS[(start + i) % SYMBOLS.length];
       var w = document.createElement("div");
       w.className = "gst-float" + (sym.mono ? " mono" : "");
-      w.style.left = rand(2, 94).toFixed(1) + "%";
+      // Longer words start further left so they aren't cut off at the edge.
+      w.style.left = rand(2, sym.t.length > 6 ? 72 : 94).toFixed(1) + "%";
       w.style.top = rand(4, 86).toFixed(1) + "%";
       var s = document.createElement("span");
       s.textContent = sym.t;
@@ -278,9 +283,51 @@
   }
 
   /* ---------------------------------------------------------------
+     PROCESS TIMELINE (practice-areas.html, "How We Work")
+     The gold line draws from step 01 to 04, each circle lights up with
+     a halo and its text rises, when the timeline scrolls into view.
+     The sequence itself is CSS (.px-steps.is-armed / .is-drawn).
+  --------------------------------------------------------------- */
+  function initProcessTimeline() {
+    var list = document.querySelector(".px-steps");
+    if (!list || reduced || !canObserve) return; // stays in its final, visible state
+    list.classList.add("is-armed");
+    var io = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      // next frame, so the "before" state is painted and the transitions run
+      requestAnimationFrame(function () { list.classList.add("is-drawn"); });
+      io.disconnect();
+    }, { threshold: 0.3 });
+    io.observe(list);
+  }
+
+  /* ---------------------------------------------------------------
+     WHY ADA (practice-areas.html, "Our Approach")
+     One cinematic entry when ~22% of the section is in view: image
+     layers, quote, gold orbit, headline, then the three strengths.
+     The choreography is CSS (.px-why.is-armed / .is-in); this only
+     arms it and starts the orbit's travelling point (SVG SMIL).
+  --------------------------------------------------------------- */
+  function initWhy() {
+    var sec = document.querySelector(".px-why");
+    if (!sec || reduced || !canObserve) return; // stays in its final, visible state
+    sec.classList.add("is-armed");
+    var io = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      io.disconnect();
+      requestAnimationFrame(function () { sec.classList.add("is-in"); });
+      var run = document.getElementById("px-orbit-run");
+      if (run && run.beginElement) setTimeout(function () { try { run.beginElement(); } catch (e) {} }, 750);
+    }, { threshold: 0.22 });
+    io.observe(sec);
+  }
+
+  /* ---------------------------------------------------------------
      BOOT
   --------------------------------------------------------------- */
   function boot() {
+    initWhy();
+    initProcessTimeline();
     initProgress();
     initTicker();
     initFloaters();

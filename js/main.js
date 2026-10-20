@@ -487,3 +487,70 @@ document.addEventListener("ada:partials-loaded", function () {
     if (window.innerWidth !== lastW) { lastW = window.innerWidth; clear(true); }
   });
 })();
+
+/* ===================================================================
+   PRACTICE AREAS page (practice-areas.html)
+   1. Service pop-up: every arrow is a <details class="px-more"> holding
+      that service's full text. With JS, clicking it opens the shared
+      <dialog id="px-dialog"> with that text instead of expanding the card.
+      (Without JS the <details> simply expands in place.)
+   2. Sticky section bar: highlights the section currently in view.
+   3. Other Services arrows: scroll the card row when it is a carousel
+      (tablet / phone); hidden on desktop where all cards are visible.
+=================================================================== */
+(function () {
+  var dialog = document.getElementById("px-dialog");
+  if (dialog && typeof dialog.showModal === "function") {
+    var content = dialog.querySelector(".px-dialog-content");
+    var lastTrigger = null;
+    document.addEventListener("click", function (e) {
+      var summary = e.target.closest && e.target.closest(".px-more > summary");
+      if (!summary) return;
+      e.preventDefault(); // don't expand inline
+      var body = summary.parentElement.querySelector(".px-more-body");
+      if (!body) return;
+      content.innerHTML = "";
+      var copy = body.cloneNode(true);
+      var heading = copy.querySelector("h4");
+      if (heading) heading.id = "px-dialog-title";
+      content.appendChild(copy);
+      lastTrigger = summary;
+      dialog.showModal();
+      dialog.scrollTop = 0;
+    });
+    dialog.querySelector(".px-dialog-close").addEventListener("click", function () { dialog.close(); });
+    // Click on the dimmed backdrop (outside the panel) closes it
+    dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener("close", function () { if (lastTrigger) lastTrigger.focus(); });
+  }
+
+  var subnav = document.querySelector(".px-subnav");
+  if (subnav && "IntersectionObserver" in window) {
+    var links = Array.prototype.slice.call(subnav.querySelectorAll(".px-subnav-links a"));
+    var byId = {};
+    links.forEach(function (a) { byId[a.getAttribute("href").slice(1)] = a; });
+    var visible = {};
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { visible[en.target.id] = en.isIntersecting ? en.intersectionRatio : 0; });
+      var best = null, bestRatio = 0;
+      Object.keys(visible).forEach(function (id) { if (visible[id] > bestRatio) { bestRatio = visible[id]; best = id; } });
+      links.forEach(function (a) {
+        var on = best && a === byId[best];
+        a.classList.toggle("is-active", !!on);
+        if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+      });
+    }, { rootMargin: "-20% 0px -50% 0px", threshold: [0, .1, .25, .5, .75, 1] });
+    Object.keys(byId).forEach(function (id) { var s = document.getElementById(id); if (s) io.observe(s); });
+  }
+
+  var list = document.getElementById("px-svc-list");
+  if (list) {
+    document.querySelectorAll("[data-scroll][aria-controls='px-svc-list']").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var card = list.querySelector(".px-svc");
+        var step = card ? card.getBoundingClientRect().width + 16 : list.clientWidth * 0.8;
+        list.scrollBy({ left: step * parseInt(btn.getAttribute("data-scroll"), 10), behavior: "smooth" });
+      });
+    });
+  }
+})();

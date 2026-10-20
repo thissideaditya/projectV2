@@ -40,6 +40,7 @@ body { animation: ada-page-in .7s ease-out both; }
 .gst-floaters { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .gst-float {
   position: absolute;
+  white-space: nowrap; /* "Supreme Court", "GST Consultancy" stay on one line */
   transform: translate(var(--dx, 0px), var(--dy, 0px));
   transition: transform .5s cubic-bezier(.2,.7,.2,1);
   will-change: transform;

@@ -402,6 +402,15 @@ body.disclaimer-active > *:not(.disclaimer-overlay) { filter: blur(6px); }
 .cta-band { background: var(--gold-500); color: var(--green-950); text-align: center; }
 .cta-band h2 { color: var(--green-950); }
 
+/* Home: "For more GST related information" band below the videos */
+.gst-more { background: var(--green-950); color: var(--cream-100); padding: clamp(1.75rem, 4vw, 2.5rem) 0; border-top: 1px solid rgba(220, 184, 74, .35); border-bottom: 1px solid rgba(220, 184, 74, .35); }
+.gst-more-inner { display: flex; align-items: center; justify-content: center; gap: 1.25rem 1.5rem; flex-wrap: wrap; text-align: center; }
+.gst-more-icon { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: rgba(220, 184, 74, .14); color: var(--gold-400); font-size: 1.5rem; }
+.gst-more-text { margin: 0; font-family: var(--font-display); font-size: clamp(1.15rem, 2.2vw, 1.5rem); line-height: 1.4; color: var(--cream-50); }
+.gst-more-text a { color: var(--gold-400); text-decoration: underline; text-decoration-color: rgba(220, 184, 74, .5); text-underline-offset: .2em; }
+.gst-more-text a:hover, .gst-more-text a:focus-visible { color: var(--gold-500); text-decoration-color: currentColor; }
+.gst-more-btn { white-space: nowrap; }
+
 /* ---------------------------------------------------------------
    PULL QUOTE
 --------------------------------------------------------------- */
@@ -2260,4 +2269,465 @@ body.disclaimer-active .section-dots { display: none; }
   .people-copy .eyebrow { justify-content: center; }
   .people-copy .divider-gold { margin-left: auto; margin-right: auto; }
   .people-courthouse { max-width: 60%; opacity: .5; }
+}
+
+/* ===================================================================
+   PRACTICE AREAS (practice-areas.html)
+   Sticky section bar · 02 GST flagship (dark, photo right) · 03 other
+   services (horizontal cards) · 04 why ADA (image + quote, 3 strengths)
+   · 05 how we work (heading left, drawn timeline right) · 06 CTA.
+   Arrows are <details class="px-more">; js/main.js opens their content
+   in the shared <dialog class="px-dialog">.
+   Cards use px-* classes (not .card), so main.js's grid focus-expand
+   leaves them alone; motion.js still fades in .section-head / .grid > *.
+=================================================================== */
+.px-arrow { display: inline-block; margin-left: .35em; transition: transform .25s var(--ease); }
+a:hover .px-arrow, summary:hover .px-arrow { transform: translate(2px, -2px); }
+
+/* Round arrow button (cards, pills, carousel) */
+.px-go {
+  flex: none; display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  border: 1.5px solid var(--gold-500); color: var(--green-950); background: transparent; font-size: 1rem;
+  transition: background .25s var(--ease), color .25s var(--ease), transform .25s var(--ease);
+}
+.px-go--btn { cursor: pointer; padding: 0; }
+.px-go--btn:hover, .px-go--btn:focus-visible { background: var(--gold-500); }
+
+/* 01 · Hero */
+.px-hero .hero-copy h1 { max-width: 15ch; }
+.px-hero-actions { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: .4rem !important; }
+.px-hero-actions .btn { padding: .95em 1.6em; }
+.px-btn-light { color: var(--cream-50); border-color: rgba(244, 233, 201, .7); }
+.px-btn-light:hover { color: var(--gold-400); border-color: var(--gold-400); }
+.px-hero-tag { font-family: var(--font-caption); font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; color: var(--gold-400); padding-top: .3rem; border-top: 1px solid rgba(220, 184, 74, .35); }
+
+/* Sticky section bar */
+.px-subnav { position: sticky; top: var(--hh, 0px); z-index: 400; background: rgba(250, 247, 239, .96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid rgba(201, 162, 39, .25); }
+.px-subnav .container { display: flex; align-items: center; gap: 1.5rem; }
+.px-subnav-links { flex: 1; display: flex; justify-content: center; gap: clamp(1.25rem, 4vw, 3rem); overflow-x: auto; scrollbar-width: none; }
+.px-subnav-links::-webkit-scrollbar { display: none; }
+.px-subnav-links a {
+  flex: none; padding: .95rem 0; font-family: var(--font-caption); font-size: .7rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--green-950); text-decoration: none; border-bottom: 2px solid transparent; transition: color .25s var(--ease), border-color .25s var(--ease);
+}
+.px-subnav-links a:hover, .px-subnav-links a:focus-visible, .px-subnav-links a.is-active { color: var(--gold-700); border-bottom-color: var(--gold-500); }
+.px-subnav-cta { flex: none; display: inline-flex; align-items: center; gap: .6rem; font-size: .8rem; color: var(--gold-700); text-decoration: none; }
+.px-subnav-cta .px-go { width: 30px; height: 30px; font-size: .9rem; }
+.px-subnav-cta:hover .px-go { background: var(--gold-500); }
+
+/* Shared section rhythm */
+.px-section { position: relative; padding: clamp(3.5rem, 7vw, 6rem) 0; scroll-margin-top: calc(var(--hh, 5rem) + 3rem); }
+.px-section .container { position: relative; max-width: 1260px; }
+.px-head { max-width: 640px; margin-bottom: clamp(2rem, 4vw, 2.75rem); }
+.px-head .lede { margin: 0; }
+.px-card-icon {
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(201, 162, 39, .14); color: var(--gold-600); font-size: 1.3rem;
+}
+
+/* Arrow details: an inline expand without JS, a pop-up with JS */
+.px-more > summary { list-style: none; cursor: pointer; }
+.px-more > summary::-webkit-details-marker { display: none; }
+.px-more > summary:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 3px; border-radius: 999px; }
+.px-more > summary:hover .px-go { background: var(--gold-500); color: var(--green-950); transform: translateX(2px); }
+.px-more-body { padding-top: 1rem; }
+.px-more-body h4 { font-size: 1.15rem; margin-bottom: .5rem; }
+.px-more-body p { font-size: .95rem; line-height: 1.65; color: var(--ink-700); }
+.px-more-body ul { margin: .5rem 0 0; padding-left: 1.1rem; }
+.px-more-body li { font-size: .92rem; line-height: 1.55; color: var(--ink-700); margin-bottom: .45rem; }
+.px-more-body li::marker { color: var(--gold-500); }
+.px-pill {
+  display: inline-flex; align-items: center; gap: .9rem; padding: .45rem .5rem .45rem 1.3rem; border-radius: 999px;
+  border: 1.5px solid var(--gold-500); color: var(--cream-50); font-weight: 600; font-size: .9rem;
+}
+.px-pill .px-go { width: 30px; height: 30px; background: var(--gold-500); border-color: var(--gold-500); color: var(--green-950); }
+.px-textlink { display: inline-flex; align-items: center; font-weight: 700; font-size: .92rem; color: var(--gold-700); border-bottom: 1px solid rgba(201, 162, 39, .6); padding-bottom: .15rem; }
+.px-head-action { margin-top: 1.5rem; }
+
+/* The pop-up */
+.px-dialog {
+  width: min(640px, calc(100vw - 2rem)); max-height: min(85vh, 760px); padding: 0; border: 1px solid var(--gold-500); border-radius: 14px;
+  background: var(--cream-50); color: var(--ink-900); box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .6);
+}
+.px-dialog::backdrop { background: rgba(11, 33, 24, .6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.px-dialog[open] { animation: px-dialog-in .3s var(--ease); }
+@keyframes px-dialog-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.px-dialog-inner { position: relative; padding: clamp(1.5rem, 4vw, 2.5rem); }
+.px-dialog-content .px-more-body { padding-top: 0; }
+.px-dialog-content h4 { font-size: clamp(1.3rem, 3vw, 1.6rem); padding-right: 2.5rem; }
+.px-dialog-close {
+  position: absolute; top: 1rem; right: 1rem; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid rgba(201, 162, 39, .5); background: transparent; color: var(--green-950); font-size: 1.1rem; cursor: pointer;
+}
+.px-dialog-close:hover, .px-dialog-close:focus-visible { background: var(--gold-500); }
+.px-dialog-cta { margin-top: 1.5rem; }
+
+/* 02 · GST flagship (dark band, photo on the right) */
+.px-gst { background: radial-gradient(90% 70% at 50% 30%, #12352a 0%, #0b2119 55%, #08180f 100%); color: var(--cream-100); overflow: hidden; isolation: isolate; }
+/* Side scenery (scales & books left, GST columns right) frames the centred content */
+.px-gst .container { max-width: 1180px; }
+.px-gst-side { position: absolute; top: 0; bottom: 0; z-index: -1; pointer-events: none; width: max(calc((100% - 1100px) / 2 + 60px), 0px); }
+.px-gst-side--left {
+  left: 0; background: url("../assets/images/gst-side-left.webp") right center / cover no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent); mask-image: linear-gradient(90deg, #000 55%, transparent);
+}
+.px-gst-side--right {
+  right: 0; background: url("../assets/images/gst-side-right.webp") left center / cover no-repeat;
+  -webkit-mask-image: linear-gradient(270deg, #000 55%, transparent); mask-image: linear-gradient(270deg, #000 55%, transparent);
+}
+.px-gst-lines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.px-gst-lines path { fill: none; stroke: var(--gold-500); stroke-width: 1; opacity: .35; vector-effect: non-scaling-stroke; }
+.px-gst .section-title, .px-gst h3 { color: var(--cream-50); }
+.px-gst .eyebrow { color: var(--gold-400); }
+.px-gst .lede { color: rgba(244, 233, 201, .85); }
+.px-gst .px-head { max-width: 520px; }
+.px-gst-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; align-items: stretch; }
+/* Flagship: a light card on the dark band, faint columns behind */
+.px-feature {
+  position: relative; display: flex; flex-direction: column; overflow: hidden; isolation: isolate;
+  padding: clamp(1.75rem, 3.5vw, 2.5rem); border-radius: 12px;
+  background: linear-gradient(120deg, #fdfaf2 0%, #f6efdd 100%); border: 1px solid rgba(201, 162, 39, .45);
+  box-shadow: 0 30px 60px -36px rgba(0, 0, 0, .7); color: var(--ink-700);
+}
+.px-feature::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 46%; z-index: -1; pointer-events: none; opacity: .5;
+  background: url("../assets/images/people/people-courthouse.webp") right center / cover no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 60%); mask-image: linear-gradient(90deg, transparent, #000 60%);
+}
+.px-feature h3 { color: var(--green-950); font-size: clamp(1.55rem, 2.6vw, 2rem); margin-bottom: .8rem; }
+.px-feature > p { font-size: .95rem; line-height: 1.6; margin-bottom: 1.4rem; max-width: 52ch; }
+.px-tag {
+  align-self: flex-start; margin-bottom: 1rem; padding: .3rem .8rem; border-radius: 999px; border: 1px solid var(--gold-500);
+  font-family: var(--font-caption); font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-700); background: rgba(255, 255, 255, .6);
+}
+.px-svc-links { list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem 1.5rem; max-width: 520px; }
+.px-svc-links li { display: flex; gap: .55rem; align-items: flex-start; font-size: .9rem; line-height: 1.45; color: var(--ink-700); }
+.px-svc-links i { color: var(--gold-600); margin-top: .15rem; }
+.px-feature .px-more { margin-top: auto; }
+/* GST cards: translucent dark tiles, arrow bottom-right */
+.px-gst-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.px-gst-card {
+  position: relative; display: flex; flex-direction: column; gap: .8rem; padding: 1.4rem 1.4rem 1.2rem; border-radius: 10px;
+  background: linear-gradient(160deg, rgba(20, 64, 47, .78), rgba(9, 30, 22, .9)); border: 1px solid rgba(220, 184, 74, .3);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); overflow: hidden; isolation: isolate;
+  transition: transform .3s var(--ease), border-color .3s var(--ease);
+}
+/* Faint motif in each card (gavel, coins, court…) */
+.px-card-art {
+  position: absolute; right: -.6rem; top: 1rem; transform: rotate(-8deg); z-index: -1; pointer-events: none;
+  font-size: 6.5rem; line-height: 1; color: rgba(220, 184, 74, .055);
+}
+.px-gst-card--wide .px-card-art { right: 1rem; top: 50%; transform: translateY(-50%); font-size: 8.5rem; }
+.px-gst-card:hover { transform: translateY(-4px); border-color: var(--gold-500); }
+.px-gst-card .px-card-icon { width: 40px; height: 40px; background: rgba(220, 184, 74, .14); color: var(--gold-400); font-size: 1.15rem; }
+.px-gst-card h3 { font-size: 1.08rem; margin: 0 0 .4rem; }
+.px-gst-card p { margin: 0; font-size: .82rem; line-height: 1.5; color: rgba(244, 233, 201, .8); }
+.px-gst-card .px-gst-card-text { flex: 1; padding-right: 1.6rem; }
+.px-gst-card--wide .px-gst-card-text { padding-right: 3rem; }
+.px-gst-card > .px-more { position: absolute; right: 1.1rem; bottom: 1.1rem; }
+.px-gst-card .px-go { color: var(--cream-50); }
+.px-gst-wide { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-top: 1.25rem; }
+.px-gst-card--wide { flex-direction: row; align-items: flex-start; gap: 1.1rem; padding: 1.5rem 1.5rem 1.4rem; }
+.px-gst-card--wide h3 { font-size: 1.15rem; }
+.px-gst-card--wide p { font-size: .84rem; line-height: 1.55; }
+.px-chips { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem; margin: .9rem 0 0; padding: 0; }
+.px-chips li {
+  padding: .25rem .65rem; border-radius: 999px; border: 1px solid rgba(220, 184, 74, .35); background: rgba(220, 184, 74, .08);
+  font-family: var(--font-caption); font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-400);
+}
+/* Without JS an opened arrow expands below its card text */
+.px-gst-card > .px-more[open] { position: static; }
+.px-gst-card .px-more-body p, .px-gst-card .px-more-body li, .px-gst-card .px-more-body h4 { color: var(--cream-100); }
+
+/* 03 · Other services (light band; scenery from the edges, cards with faint motifs) */
+.px-other { background: radial-gradient(80% 70% at 50% 40%, #fbf7ee 0%, #f6efdf 70%, #f1e7d2 100%); overflow: hidden; isolation: isolate; }
+.px-other-art { position: absolute; z-index: -1; pointer-events: none; }
+.px-other-art--left {
+  top: 0; bottom: 0; left: 0; width: max(calc((100% - 1270px) / 2 + 40px), 0px);
+  background: url("../assets/images/other-side-left.webp") right bottom / cover no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, #000 60%, transparent); mask-image: linear-gradient(90deg, #000 60%, transparent);
+}
+.px-other-art--right {
+  top: 0; bottom: 0; right: 0; width: max(calc((100% - 1270px) / 2 + 20px), 0px);
+  background: url("../assets/images/other-side-right.webp") left center / cover no-repeat;
+  -webkit-mask-image: linear-gradient(270deg, #000 60%, transparent); mask-image: linear-gradient(270deg, #000 60%, transparent);
+}
+.px-other-art--top {
+  top: 0; right: 0; width: min(46%, 720px); height: 300px;
+  background: url("../assets/images/other-top-right.webp") right top / cover no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%), linear-gradient(180deg, #000 60%, transparent);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, #000 35%), linear-gradient(180deg, #000 60%, transparent); mask-composite: intersect;
+}
+.px-other-lines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.px-other-lines path { fill: none; stroke: var(--gold-500); stroke-width: 1; opacity: .45; vector-effect: non-scaling-stroke; }
+.px-other .container { max-width: 1340px; }
+.px-other .section-title { font-size: clamp(2.2rem, 4.2vw, 3.4rem); }
+.px-other .px-head { max-width: 700px; }
+.px-other .px-head .divider-gold { margin: .9rem 0 1.2rem; }
+.px-other-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem); }
+.px-other-head .px-head { margin-bottom: 0; }
+.px-other-aside { display: flex; align-items: center; gap: 1.25rem; max-width: 360px; padding-left: 1.4rem; border-left: 2px solid var(--gold-500); }
+.px-other-aside p { margin: 0; font-size: .95rem; line-height: 1.65; color: var(--ink-500); }
+.px-carousel-btns { display: none; gap: .5rem; flex: none; }
+.px-svc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem 1.1rem; }
+.px-svc {
+  position: relative; display: flex; align-items: center; gap: 1rem; min-height: 150px; padding: 1.2rem 1.2rem 1.2rem 1.3rem; border-radius: 8px; overflow: hidden; isolation: isolate;
+  background: linear-gradient(110deg, #fffdf8 0%, #fbf6ea 60%, #f3e9d3 100%); border: 1px solid rgba(201, 162, 39, .32);
+  box-shadow: 0 18px 36px -30px rgba(80, 60, 20, .45); scroll-margin-top: calc(var(--hh, 5rem) + 4rem);
+  transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+}
+.px-svc .px-card-art { right: .4rem; top: 50%; transform: translateY(-50%) rotate(-6deg); font-size: 6.5rem; color: rgba(150, 115, 40, .065); }
+.px-svc:hover { transform: translateY(-3px); border-color: rgba(201, 162, 39, .6); box-shadow: 0 24px 44px -30px rgba(80, 60, 20, .55); }
+.px-svc:target { border-color: var(--gold-500); box-shadow: 0 0 0 3px rgba(201, 162, 39, .2); }
+.px-svc-icon { flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: rgba(201, 162, 39, .16); color: var(--gold-600); font-size: 1.6rem; }
+.px-svc-text { flex: 1; min-width: 0; }
+.px-num { display: block; font-family: var(--font-caption); font-size: .7rem; letter-spacing: .14em; color: var(--gold-700); margin-bottom: .35rem; }
+.px-svc h3 { font-size: 1.1rem; margin: 0 0 .35rem; color: var(--green-950); }
+.px-svc-line { margin: 0; font-size: .85rem; line-height: 1.5; color: var(--ink-500); }
+/* Thin rule, then a cream arrow button */
+.px-svc > .px-more { flex: none; align-self: center; padding-left: .9rem; border-left: 1px solid rgba(201, 162, 39, .35); }
+.px-svc .px-go { width: 40px; height: 40px; background: #fffaf0; border-width: 2px; font-size: 1.1rem; box-shadow: 0 6px 14px -8px rgba(80, 60, 20, .5); }
+.px-svc > .px-more[open] { flex-basis: 100%; border-left: 0; padding-left: 0; }
+.px-svc:has(> .px-more[open]) { flex-wrap: wrap; }
+
+/* 04 · Why ADA */
+.px-why { background: linear-gradient(120deg, #f6eedb 0%, #f3ead6 55%, #efe4cc 100%); overflow: hidden; isolation: isolate; }
+/* Architectural backdrop on its own layer so it can fade in */
+.px-why::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(246, 238, 219, .92) 0%, rgba(246, 238, 219, .6) 100%), url("../assets/images/practise-bkg.webp") right bottom / cover no-repeat;
+}
+.px-why-layout { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+.px-why-media { position: relative; padding: 1.75rem 0 1.75rem 0; isolation: isolate; }
+/* Offset frame behind the photo */
+.px-why-media::before {
+  content: ""; position: absolute; top: 0; left: 1.75rem; right: -1.75rem; bottom: 3.5rem; z-index: -1; border-radius: 14px;
+  background: linear-gradient(150deg, #fbf6ea, #efe3c6); border: 1px solid rgba(201, 162, 39, .35);
+}
+.px-why-frame { position: relative; display: block; border-radius: 14px; overflow: hidden; background: var(--green-950); box-shadow: 0 30px 60px -36px rgba(11, 33, 24, .7); }
+.px-why-frame::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(120deg, rgba(11, 33, 24, .55), rgba(11, 33, 24, .15) 70%); }
+.px-why-media img {
+  display: block; width: 100%; height: clamp(300px, 30vw, 400px); object-fit: cover; object-position: 97% 25%;
+  filter: sepia(.35) hue-rotate(55deg) saturate(1.4) brightness(.55) contrast(1.15);
+}
+/* Gold orbit around the images */
+.px-orbit { position: absolute; top: -12%; left: -13%; width: 132%; height: 124%; z-index: -2; overflow: visible; pointer-events: none; }
+.px-orbit-line { fill: none; stroke: var(--gold-500); stroke-width: 1.2; opacity: .55; vector-effect: non-scaling-stroke; }
+.px-orbit-dot { opacity: 0; filter: drop-shadow(0 0 6px rgba(220, 184, 74, .9)); }
+.px-quote {
+  position: absolute; right: -1.75rem; top: 50%; transform: translateY(-50%); width: min(56%, 220px); margin: 0; padding: 1.4rem 1.5rem; border-radius: 12px;
+  background: rgba(253, 250, 242, .94); border: 1px solid rgba(201, 162, 39, .4); box-shadow: 0 24px 50px -30px rgba(11, 33, 24, .55);
+  transition: translate .5s var(--px-ease), box-shadow .5s var(--px-ease);
+}
+.px-quote:hover { translate: 0 -4px; box-shadow: 0 32px 60px -30px rgba(11, 33, 24, .6); }
+.px-quote-mark { display: block; font-family: var(--font-display); font-size: 2.6rem; line-height: .6; color: var(--gold-500); margin-bottom: .4rem; }
+.px-quote p { margin: 0; font-family: var(--font-display); font-style: italic; font-size: 1.2rem; line-height: 1.35; color: var(--green-950); }
+.px-strengths { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+.px-strengths li { position: relative; display: flex; flex-direction: column; gap: .8rem; padding: 0 1.25rem; }
+/* Vertical gold separators (pseudo-elements so they can draw downward) */
+.px-strengths li + li::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 1px; background: rgba(201, 162, 39, .4); transform-origin: top; }
+.px-strengths li:first-child { padding-left: 0; }
+.px-strengths .px-card-icon { transition: box-shadow .5s var(--px-ease), background .5s var(--px-ease); }
+.px-strengths li:hover .px-card-icon { background: rgba(201, 162, 39, .22); box-shadow: 0 0 0 5px rgba(201, 162, 39, .1), 0 0 22px 2px rgba(220, 184, 74, .45); }
+.px-strengths h3 { font-size: 1.02rem; margin: 0 0 .35rem; }
+.px-strengths p { margin: 0; font-size: .88rem; line-height: 1.55; color: var(--ink-700); }
+
+/* Cinematic entry (js/motion.js adds .is-armed, then .is-in once ~22% is in view).
+   Plays once. Keyframes use fill "backwards", so after they finish the
+   elements fall back to their normal styles and hover transitions work.
+   Order: backdrop + photo → headline → quote → orbit → strengths. */
+.px-why { --px-ease: cubic-bezier(.22, 1, .36, 1); }
+.px-why.is-armed:not(.is-in)::before,
+.px-why.is-armed:not(.is-in) .px-why-media::before,
+.px-why.is-armed:not(.is-in) :is(.px-why-frame, .px-quote, .eyebrow, .section-title, .divider-gold, .lede, .px-card-icon, h3, p) { opacity: 0; }
+.px-why.is-armed:not(.is-in) .px-orbit-line { stroke-dashoffset: 1; stroke-dasharray: 1; }
+.px-why.is-armed:not(.is-in) .px-strengths li + li::before { transform: scaleY(0); }
+.px-why.is-in::before { animation: px-fade 1s var(--px-ease) backwards; }
+.px-why.is-in .px-why-media::before { animation: px-fade .9s var(--px-ease) .15s backwards; }
+.px-why.is-in .px-why-frame { animation: px-rise-40 .95s var(--px-ease) backwards; }
+.px-why.is-in .px-quote { animation: px-quote-in .9s var(--px-ease) .5s backwards; }
+.px-why.is-in .px-orbit-line { stroke-dasharray: 1; animation: px-draw 1.5s var(--px-ease) .6s backwards; }
+/* The travelling point: SMIL moves it (begins ~.75s in), CSS fades it — once with the draw, then a faint pass every 14s */
+.px-why.is-in .px-orbit-dot { animation: px-dot-run 1.5s linear .75s, px-dot-ambient 14s linear 4.25s infinite; }
+.px-why.is-in .eyebrow { animation: px-fade .7s var(--px-ease) .1s backwards; }
+.px-why.is-in .section-title { animation: px-rise-20 .75s var(--px-ease) .15s backwards; }
+.px-why.is-in .divider-gold { transform-origin: left; animation: px-grow-x .7s var(--px-ease) .45s backwards; }
+.px-why.is-in .px-head .lede { animation: px-rise-20 .75s var(--px-ease) .6s backwards; }
+/* Strengths: icon → heading → text per column, 180ms apart; separators draw down */
+.px-why.is-in .px-strengths li { --d: calc(.85s + var(--i, 0) * .18s); }
+.px-why.is-in .px-strengths li:nth-child(2) { --i: 1; }
+.px-why.is-in .px-strengths li:nth-child(3) { --i: 2; }
+.px-why.is-in .px-strengths .px-card-icon { animation: px-pop .6s var(--px-ease) var(--d) backwards; }
+.px-why.is-in .px-strengths h3 { animation: px-rise-12 .6s var(--px-ease) calc(var(--d) + .1s) backwards; }
+.px-why.is-in .px-strengths p { animation: px-rise-12 .6s var(--px-ease) calc(var(--d) + .2s) backwards; }
+.px-why.is-in .px-strengths li + li::before { animation: px-grow-y .8s var(--px-ease) var(--d) backwards; }
+@keyframes px-fade { from { opacity: 0; } }
+@keyframes px-rise-40 { from { opacity: 0; translate: 0 40px; } }
+@keyframes px-rise-20 { from { opacity: 0; translate: 0 20px; } }
+@keyframes px-rise-12 { from { opacity: 0; translate: 0 12px; } }
+@keyframes px-quote-in { from { opacity: 0; translate: 48px 0; filter: blur(8px); box-shadow: none; } }
+@keyframes px-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes px-grow-x { from { opacity: 0; scale: 0 1; } }
+@keyframes px-grow-y { from { transform: scaleY(0); } }
+@keyframes px-pop { from { opacity: 0; scale: .6; } }
+@keyframes px-dot-run { 0% { opacity: 0; } 15%, 75% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes px-dot-ambient { 0% { opacity: 0; } 6%, 38% { opacity: .7; } 45%, 100% { opacity: 0; } }
+
+/* 05 · How we work: heading left, timeline right.
+   Each step stacks on one vertical axis (40px from its left edge):
+   icon disc → numbered circle on the gold line → stem with a dot → title,
+   short gold rule, text. */
+.px-process { background: linear-gradient(100deg, #f6eedd 0%, #faf6ec 45%, #f7f0e1 100%); padding: clamp(3.5rem, 6vw, 5rem) 0; overflow: hidden; isolation: isolate; }
+.px-process-art { position: absolute; z-index: -1; pointer-events: none; }
+.px-process-art--left {
+  top: 0; bottom: 0; left: 0; width: max(calc((100% - 1420px) / 2 + 40px), 70px);
+  background: url("../assets/images/process-side-left.webp") right center / cover no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent); mask-image: linear-gradient(90deg, #000 55%, transparent);
+}
+.px-process-art--bl {
+  left: 0; bottom: 0; width: min(42%, 620px); height: 62%;
+  background: url("../assets/images/process-bottom-left.webp") left bottom / cover no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent), linear-gradient(0deg, #000 55%, transparent);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, #000 45%, transparent), linear-gradient(0deg, #000 55%, transparent); mask-composite: intersect;
+}
+.px-process-art--right {
+  top: 0; bottom: 0; right: 0; width: max(calc((100% - 1420px) / 2 + 20px), 50px);
+  background: url("../assets/images/process-side-right.webp") left center / cover no-repeat;
+  -webkit-mask-image: linear-gradient(270deg, #000 55%, transparent); mask-image: linear-gradient(270deg, #000 55%, transparent);
+}
+.px-process-art--tr {
+  top: 0; right: 0; width: 280px; height: 190px;
+  background: url("../assets/images/process-top-right.webp") right top / cover no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%), linear-gradient(180deg, #000 55%, transparent);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, #000 45%), linear-gradient(180deg, #000 55%, transparent); mask-composite: intersect;
+}
+.px-process-lines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.px-process-lines path { fill: none; stroke: var(--gold-500); stroke-width: 1; opacity: .5; vector-effect: non-scaling-stroke; }
+.px-process .container { max-width: 1480px; }
+.px-process .section-title { white-space: nowrap; font-size: clamp(2.4rem, 4.4vw, 4rem); }
+.px-process .divider-gold { width: 90px; }
+.px-process-layout { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+.px-process .px-head { margin-bottom: 0; }
+.px-steps { --gap: clamp(1.25rem, 2.5vw, 2.5rem); display: grid; list-style: none; margin: 0; padding: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
+.px-step { position: relative; padding-top: 182px; }
+.px-step-icon {
+  position: absolute; top: 0; left: 4px; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(201, 162, 39, .14); color: var(--gold-600); font-size: 2rem;
+}
+/* The gold line: a segment from each circle to the next, with a » mark */
+.px-step::before {
+  content: ""; position: absolute; top: 115px; left: 69px; right: calc(-1 * var(--gap) - 11px); height: 1px;
+  background: linear-gradient(90deg, var(--gold-500), rgba(201, 162, 39, .55)); transform-origin: left center;
+}
+.px-step::after {
+  content: "\00BB"; position: absolute; top: 106px; left: calc((69px + 100% + var(--gap) - 11px) / 2); transform: translateX(-50%);
+  font-size: 1.1rem; line-height: 1; color: var(--gold-500);
+}
+.px-step:last-child::before, .px-step:last-child::after { display: none; }
+.px-step-num {
+  position: absolute; top: 92px; left: 17px; z-index: 1; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%;
+  border: 2px solid var(--gold-500); background: var(--green-950); color: var(--gold-400);
+  font-family: var(--font-caption); font-size: .8rem; letter-spacing: .06em; box-shadow: 0 0 0 6px rgba(201, 162, 39, .18);
+}
+/* Stem from the circle down to the title, ending in a small dot */
+.px-step-num::after {
+  content: ""; position: absolute; top: calc(100% + 2px); left: calc(50% - 3px); width: 6px; height: 30px; transform-origin: top;
+  background: linear-gradient(var(--gold-500), var(--gold-500)) center top / 1px calc(100% - 5px) no-repeat,
+              radial-gradient(circle, var(--gold-600) 2.5px, transparent 3px) center bottom / 6px 6px no-repeat;
+}
+.px-step h3 { font-size: clamp(1.2rem, 1.7vw, 1.45rem); margin: 0; }
+.px-step h3::after { content: ""; display: block; width: 40px; height: 2px; margin: .7rem 0 .9rem; background: linear-gradient(90deg, var(--gold-500), var(--gold-400)); }
+.px-step p { margin: 0; font-size: .95rem; line-height: 1.6; color: var(--ink-700); }
+/* Draw-in sequence (js/motion.js adds .is-armed, then .is-drawn in view):
+   for step i at i x 0.5s: icon fades up, circle lights, stem drops, text
+   rises, then the line (and its ») draws on to the next circle. Without
+   JS / with reduced motion the steps simply show finished. */
+/* Hidden state applies instantly; the staggered transitions live on .is-drawn
+   so they only run on the reveal (not as a fade-out when the list is armed). */
+.px-steps.is-armed:not(.is-drawn) .px-step-icon { opacity: 0; scale: .85; }
+.px-steps.is-armed:not(.is-drawn) .px-step::before { transform: scaleX(0); }
+.px-steps.is-armed:not(.is-drawn) .px-step::after { opacity: 0; }
+.px-steps.is-armed:not(.is-drawn) .px-step-num { background: var(--cream-100); color: var(--ink-500); border-color: rgba(201, 162, 39, .35); box-shadow: none; }
+.px-steps.is-armed:not(.is-drawn) .px-step-num::after { transform: scaleY(0); }
+.px-steps.is-armed:not(.is-drawn) .px-step h3, .px-steps.is-armed:not(.is-drawn) .px-step p { opacity: 0; transform: translateY(14px); }
+.px-steps.is-drawn .px-step-icon { transition: opacity .45s var(--ease), scale .45s var(--ease); transition-delay: calc(var(--i) * .5s); }
+.px-steps.is-drawn .px-step::before { transition: transform .4s var(--ease) calc(var(--i) * .5s + .3s); }
+.px-steps.is-drawn .px-step::after { transition: opacity .3s var(--ease) calc(var(--i) * .5s + .5s); }
+.px-steps.is-drawn .px-step-num {
+  box-shadow: 0 0 0 6px rgba(201, 162, 39, .18), 0 0 18px 2px rgba(220, 184, 74, .45);
+  transition: background .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease), box-shadow .5s var(--ease);
+  transition-delay: calc(var(--i) * .5s + .1s);
+}
+.px-steps.is-drawn .px-step-num::after { transition: transform .3s var(--ease) calc(var(--i) * .5s + .2s); }
+.px-steps.is-drawn .px-step h3, .px-steps.is-drawn .px-step p { transition: opacity .45s var(--ease), transform .45s var(--ease); transition-delay: calc(var(--i) * .5s + .25s); }
+.px-steps.is-drawn .px-step p { transition-delay: calc(var(--i) * .5s + .35s); }
+
+/* 06 · CTA (gold band: dark button and label for contrast) */
+.px-cta { padding: clamp(3rem, 7vw, 5.5rem) 0; }
+.px-cta .eyebrow { color: var(--green-900); }
+.px-cta p { max-width: 54ch; margin: 0 auto 1.75rem; font-size: 1.08rem; }
+.px-cta .btn { background: var(--green-950); color: var(--cream-50); border-color: var(--green-950); padding: 1em 2rem; }
+.px-cta .btn:hover { background: var(--green-900); color: var(--gold-400); }
+
+@media (max-width: 1200px) {
+  .px-gst-side { width: 200px; opacity: .3; }
+  .px-other-art--left, .px-other-art--right { width: 140px; opacity: .45; }
+  .px-svc { gap: .8rem; padding-left: 1rem; }
+  .px-svc-icon { width: 46px; height: 46px; font-size: 1.3rem; }
+}
+/* Tablet */
+@media (max-width: 1000px) {
+  .px-gst-layout, .px-why-layout, .px-process-layout { grid-template-columns: minmax(0, 1fr); }
+  .px-why-media { max-width: 520px; }
+  .px-strengths { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+  .px-strengths li { flex-direction: row; padding: 1.25rem 0 0; border-left: 0; border-top: 1px solid rgba(201, 162, 39, .3); }
+  .px-strengths li + li::before { display: none; }
+  .px-orbit { display: none; }
+  .px-strengths li:first-child { padding-top: 0; border-top: 0; }
+  /* Other services: a swipeable row with working arrows */
+  .px-other-head { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .px-other-aside { max-width: none; width: 100%; justify-content: space-between; }
+  .px-carousel-btns { display: flex; }
+  .px-svc-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 0; padding-bottom: .5rem; scrollbar-width: none; }
+  .px-svc-grid::-webkit-scrollbar { display: none; }
+  .px-svc { flex: 0 0 min(340px, 78%); scroll-snap-align: start; align-self: stretch; }
+  .px-svc > .px-more[open] { flex-basis: 100%; }
+  /* How we work: vertical timeline, the line draws downward 01 → 04 */
+  .px-steps { grid-template-columns: minmax(0, 1fr); row-gap: 0; max-width: 640px; }
+  .px-step { padding: .55rem 0 2rem 4.25rem; }
+  .px-step-icon, .px-step-num::after { display: none; }
+  .px-step-num { top: 0; left: 0; }
+  .px-step::before {
+    top: 54px; bottom: 6px; left: 23px; right: auto; width: 1px; height: auto;
+    background: linear-gradient(180deg, var(--gold-500), rgba(201, 162, 39, .45)); transform-origin: center top;
+  }
+  .px-step::after { top: auto; bottom: 40%; left: 23px; transform: translateX(-50%) rotate(90deg); }
+  .px-process-art--bl, .px-process-art--tr { opacity: .5; }
+  .px-step:last-child { padding-bottom: 0; }
+  .px-steps.is-armed:not(.is-drawn) .px-step::before { transform: scaleY(0); }
+}
+/* Phone */
+@media (max-width: 640px) {
+  .px-section .container { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .px-subnav .container { gap: .75rem; }
+  .px-subnav-links { justify-content: flex-start; }
+  .px-subnav-cta span:not(.px-go) { display: none; }
+  .px-subnav-cta { font-size: 0; }
+  .px-gst-cards, .px-gst-wide, .px-svc-links { grid-template-columns: minmax(0, 1fr); }
+  .px-gst-card--wide { flex-direction: column; }
+  .px-hero-actions .btn { flex: 1 1 100%; justify-content: center; text-align: center; }
+  .px-why-media { padding: 1.25rem 0; }
+  .px-why-media::before { left: 1rem; right: -.75rem; }
+  .px-quote { right: -.5rem; }
+  .px-why-media img { height: 240px; }
+  .px-quote { width: 72%; padding: 1.1rem 1.2rem; }
+  .px-quote p { font-size: 1.05rem; }
+  .px-svc { flex-basis: 86%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .px-why *, .px-why::before, .px-why-media::before, .px-strengths li::before { animation: none !important; }
+  .px-orbit-dot { display: none; }
+  .px-gst-card, .px-svc, .px-why-media img, .px-arrow, .px-go, .px-step::before, .px-step::after, .px-step-num, .px-step-num::after, .px-step-icon, .px-step h3, .px-step p { transition: none !important; }
+  .px-gst-card:hover, .px-svc:hover { transform: none; }
+  .px-dialog[open] { animation: none; }
 }
