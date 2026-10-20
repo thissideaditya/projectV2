@@ -2281,7 +2281,9 @@ body.disclaimer-active .section-dots { display: none; }
    Cards use px-* classes (not .card), so main.js's grid focus-expand
    leaves them alone; motion.js still fades in .section-head / .grid > *.
 =================================================================== */
-.px-arrow { display: inline-block; margin-left: .35em; transition: transform .25s var(--ease); }
+/* Arrow is a Tabler icon, not the ↗ character, which phones render as an emoji */
+.px-arrow { display: inline-block; margin-left: .35em; line-height: 1; transition: transform .25s var(--ease); }
+.px-arrow .ti { font-size: 1.1em; vertical-align: -.12em; }
 a:hover .px-arrow, summary:hover .px-arrow { transform: translate(2px, -2px); }
 
 /* Round arrow button (cards, pills, carousel) */
