@@ -2022,11 +2022,18 @@ body.disclaimer-active .floating-contact { display: none; }
    counts down. Behaviour: js/section-dots.js
 =================================================================== */
 /* Centred in the space between the header and the floating WhatsApp/email
-   buttons (bottom-right, ~10rem tall), so the two never overlap. */
+   buttons (bottom-right, ~10rem tall), so the two never overlap.
+   The rail is boxed into that space (top/bottom + max-height, centred with
+   auto margins) rather than centred with translateY(-50%): on short windows
+   (about 680px tall and below) the rail was taller than the gap, so its top
+   slid up under the header. When space runs out, the lines shrink. */
 .section-dots {
   --dots-clear-bottom: 10.5rem;
+  --dots-gap: .75rem;
   position: fixed; right: clamp(.6rem, 1.6vw, 1.5rem); z-index: 400;
-  top: calc((var(--hh, 6rem) + 100vh - var(--dots-clear-bottom)) / 2); transform: translateY(-50%);
+  top: calc(var(--hh, 6rem) + var(--dots-gap)); bottom: calc(var(--dots-clear-bottom) + var(--dots-gap));
+  height: fit-content; max-height: calc(100vh - var(--hh, 6rem) - var(--dots-clear-bottom) - 2 * var(--dots-gap));
+  margin: auto 0; box-sizing: border-box;
   display: flex; flex-direction: column; align-items: center;
   padding: .7rem .45rem; border-radius: 999px;
   background: rgba(11, 33, 24, .72); /* solid tint, no backdrop blur: a blur repaints every frame while the page scrolls */
@@ -2036,7 +2043,7 @@ html.is-scrolling body * { pointer-events: none !important; }
 .section-dots[hidden] { display: none; }
 body.disclaimer-active .section-dots { display: none; }
 .section-dots__dot {
-  position: relative; width: clamp(12px, 2.4vh, 22px); height: clamp(12px, 2.4vh, 22px); padding: 0; border-radius: 50%;
+  position: relative; flex: none; width: clamp(12px, 2.4vh, 22px); height: clamp(12px, 2.4vh, 22px); padding: 0; border-radius: 50%;
   background: transparent; border: 1.5px solid rgba(244, 233, 201, .55);
   transition: border-color .25s var(--ease), transform .25s var(--ease);
 }
@@ -2058,7 +2065,7 @@ body.disclaimer-active .section-dots { display: none; }
 }
 .section-dots__dot:hover span, .section-dots__dot:focus-visible span { opacity: 1; transform: translate(0, -50%); }
 .section-dots__line {
-  position: relative; width: 2px; height: clamp(6px, 2vh, 26px); margin: 4px 0;
+  position: relative; width: 2px; flex: 0 1 clamp(6px, 2vh, 26px); min-height: 3px; margin: 4px 0;
   background: rgba(244, 233, 201, .25); border-radius: 2px; overflow: hidden;
 }
 .section-dots__line i {
@@ -2070,7 +2077,7 @@ body.disclaimer-active .section-dots { display: none; }
 @media (max-width: 760px) {
   .section-dots { --dots-clear-bottom: 9.5rem; padding: .5rem .3rem; right: .35rem; }
   .section-dots__dot { width: 14px; height: 14px; }
-  .section-dots__line { height: clamp(6px, 1.8vh, 14px); margin: 3px 0; }
+  .section-dots__line { flex-basis: clamp(6px, 1.8vh, 14px); margin: 3px 0; }
   .section-dots__dot span { display: none; }
 }
 
