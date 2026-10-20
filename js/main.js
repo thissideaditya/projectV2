@@ -139,6 +139,44 @@
   }
 
   /* -------------------------------------------------------------
+     2b. SERVICES MEGA MENU
+     Hovering (or keyboard-focusing) a category on the left shows its
+     panel of services on the right. Delegated on document, so it works
+     whenever partials.js injects the header.
+  ------------------------------------------------------------- */
+  function showMegaPanel(e) {
+    var cat = e.target.closest && e.target.closest(".mega-cat");
+    if (!cat || cat.classList.contains("is-active")) return;
+    var mega = cat.closest(".mega");
+    var panel = mega && mega.querySelector("#" + cat.getAttribute("data-mega"));
+    if (!panel) return;
+    mega.querySelectorAll(".mega-cat.is-active, .mega-panel.is-active").forEach(function (el) { el.classList.remove("is-active"); });
+    cat.classList.add("is-active");
+    panel.classList.add("is-active");
+  }
+  document.addEventListener("mouseover", showMegaPanel);
+  document.addEventListener("focusin", showMegaPanel);
+
+  // Clicking a link inside a dropdown closes it, even though the pointer is
+  // still over it (same-page links like practice-areas.html#gst only scroll).
+  // .is-closing holds it shut until the pointer comes back onto the menu's
+  // label (not "mouseleave": hiding the panel itself fires that at once) or
+  // keyboard focus returns to the menu.
+  document.addEventListener("click", function (e) {
+    var link = e.target.closest && e.target.closest(".main-nav .dropdown a");
+    if (!link) return;
+    var li = link.closest(".has-dropdown");
+    var row = li && li.querySelector(".nav-item-row");
+    if (!row) return;
+    li.classList.remove("open");
+    li.classList.add("is-closing");
+    link.blur();
+    var reopen = function () { li.classList.remove("is-closing"); row.removeEventListener("mouseenter", reopen); li.removeEventListener("focusin", reopen); };
+    row.addEventListener("mouseenter", reopen);
+    li.addEventListener("focusin", reopen);
+  });
+
+  /* -------------------------------------------------------------
      3. ACTIVE LINK HIGHLIGHTING
      Compares each nav link's pathname against the current page.
   ------------------------------------------------------------- */
@@ -208,6 +246,24 @@
     else setTimeout(settle, 900);
     if (history.replaceState) history.replaceState(null, "", "#" + target.id);
   });
+
+  // Arriving at practice-areas.html#card (e.g. from the header's Services
+  // menu): the browser jumps before the header is injected and while the
+  // card still sits low for its scroll-reveal, so it lands under the sticky
+  // bars. Jump again once the page has settled, then nudge into place.
+  function jumpToHash() {
+    var id = decodeURIComponent((location.hash || "").slice(1));
+    var target = id && document.getElementById(id);
+    if (!target || !target.closest(".px-section")) return;
+    target.classList.remove("reveal", "reveal--fade", "in");
+    target.scrollIntoView({ block: "start" });
+    setTimeout(function () {
+      var off = target.getBoundingClientRect().top - (parseFloat(getComputedStyle(target).scrollMarginTop) || 0);
+      if (Math.abs(off) > 2) window.scrollBy({ top: off });
+    }, 350);
+  }
+  window.addEventListener("hashchange", jumpToHash);
+  document.addEventListener("ada:partials-loaded", function () { setTimeout(jumpToHash, 60); });
 
   // Nav toggling, active-link highlighting, and the footer year all
   // need the real header/footer markup in the DOM first — which

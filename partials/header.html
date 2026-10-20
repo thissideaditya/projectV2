@@ -7,7 +7,57 @@
     <nav class="main-nav" aria-label="Primary">
       <ul>
         <li><a href="index.html">Home</a></li>
-        <li><a href="practice-areas.html">Services</a></li>
+        <!-- Services mega menu: hover a category on the left to show its services on the right (js/main.js) -->
+        <li class="has-dropdown has-mega">
+          <div class="nav-item-row">
+            <a href="practice-areas.html">Services</a>
+            <img src="assets/images/down.png" alt="down icon" class="dropdown-icon" style="width: 10px; height: 10px;">
+          </div>
+          <div class="dropdown mega">
+            <div class="mega-cats">
+              <a class="mega-cat is-active" href="practice-areas.html#gst" data-mega="mega-gst">
+                <span class="mega-cat-ico" aria-hidden="true"><i class="ti ti-receipt-tax"></i></span>
+                <span class="mega-cat-text"><strong>GST Services</strong><small>Advisory, compliance &amp; litigation</small></span>
+                <i class="ti ti-chevron-right mega-cat-go" aria-hidden="true"></i>
+              </a>
+              <a class="mega-cat" href="practice-areas.html#other-services" data-mega="mega-other">
+                <span class="mega-cat-ico" aria-hidden="true"><i class="ti ti-briefcase-2"></i></span>
+                <span class="mega-cat-text"><strong>Other Services</strong><small>Tax, corporate, regulatory &amp; disputes</small></span>
+                <i class="ti ti-chevron-right mega-cat-go" aria-hidden="true"></i>
+              </a>
+            </div>
+            <div class="mega-panels">
+              <div class="mega-panel is-active" id="mega-gst">
+                <p class="mega-panel-title">GST Services</p>
+                <div class="mega-links">
+                  <a class="mega-link" href="practice-areas.html#gst-advisory"><span class="mega-ico" aria-hidden="true"><i class="ti ti-scale"></i></span><span><strong>GST Advisory &amp; Litigation</strong><small>End-to-end support across all stages</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#gst-compliance"><span class="mega-ico" aria-hidden="true"><i class="ti ti-clipboard-check"></i></span><span><strong>Compliance &amp; Registration</strong><small>Registration, amendments, cancellation</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#gst-litigation"><span class="mega-ico" aria-hidden="true"><i class="ti ti-gavel"></i></span><span><strong>GST Litigation</strong><small>Show-cause notices and adjudication</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#gst-health-checks"><span class="mega-ico" aria-hidden="true"><i class="ti ti-stethoscope"></i></span><span><strong>GST Health Checks</strong><small>Exposure reviews and ITC analysis</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#gst-refunds"><span class="mega-ico" aria-hidden="true"><i class="ti ti-receipt-refund"></i></span><span><strong>Refunds &amp; ITC</strong><small>Refund claims and ITC disputes</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#gst-appeals"><span class="mega-ico" aria-hidden="true"><i class="ti ti-stairs-up"></i></span><span><strong>GST Appeals</strong><small>Commissioner (Appeals) to Supreme Court</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#gst-audits"><span class="mega-ico" aria-hidden="true"><i class="ti ti-report-search"></i></span><span><strong>Audits &amp; Investigations</strong><small>Audits, searches, summons and DGGI</small></span></a>
+                </div>
+                <a class="mega-all" href="practice-areas.html#gst">View all GST services <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+              </div>
+              <div class="mega-panel" id="mega-other">
+                <p class="mega-panel-title">Other Services</p>
+                <div class="mega-links">
+                  <a class="mega-link" href="practice-areas.html#direct-tax"><span class="mega-ico" aria-hidden="true"><i class="ti ti-building-bank"></i></span><span><strong>Direct Tax</strong><small>Advisory, assessments and appeals</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#fema"><span class="mega-ico" aria-hidden="true"><i class="ti ti-world"></i></span><span><strong>FEMA &amp; Foreign Investment</strong><small>Cross-border transactions and compliance</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#mergers"><span class="mega-ico" aria-hidden="true"><i class="ti ti-arrows-exchange"></i></span><span><strong>Mergers &amp; Acquisitions</strong><small>Deal structuring and due diligence</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#contracts"><span class="mega-ico" aria-hidden="true"><i class="ti ti-file-pencil"></i></span><span><strong>Contracts</strong><small>Drafting, review and negotiation</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#corporate"><span class="mega-ico" aria-hidden="true"><i class="ti ti-building-skyscraper"></i></span><span><strong>Corporate Law &amp; IBC</strong><small>Governance and insolvency proceedings</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#economic-offences"><span class="mega-ico" aria-hidden="true"><i class="ti ti-shield-lock"></i></span><span><strong>Economic Offences</strong><small>PMLA, Benami and Black Money</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#arbitration"><span class="mega-ico" aria-hidden="true"><i class="ti ti-scale"></i></span><span><strong>Dispute Resolution</strong><small>Arbitration, mediation and litigation</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#regulatory"><span class="mega-ico" aria-hidden="true"><i class="ti ti-license"></i></span><span><strong>Regulatory Compliance</strong><small>Licensing and statutory obligations</small></span></a>
+                  <a class="mega-link" href="practice-areas.html#data-protection"><span class="mega-ico" aria-hidden="true"><i class="ti ti-lock-access"></i></span><span><strong>Data Protection</strong><small>DPDP Act advisory and representation</small></span></a>
+                </div>
+                <a class="mega-all" href="practice-areas.html#other-services">View all other services <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+        </li>
         <li class="has-dropdown">
           <div class="nav-item-row">
             <a href="about.html">About</a>

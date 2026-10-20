@@ -42,6 +42,17 @@
     }
   } catch (e) {}
 
+  // The header's Services menu uses Tabler icons; load the icon font on
+  // pages that don't already include it.
+  if (!document.querySelector('link[href*="tabler-icons"]')) {
+    var icons = document.createElement("link");
+    icons.rel = "stylesheet";
+    icons.href = "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css";
+    icons.integrity = "sha384-IcAOG/1tqv9Qnam+j3mZYPAFcNQMnQpMcafc8Nsvd44AUeTCzhUzdQiJkrROmqW6";
+    icons.crossOrigin = "anonymous";
+    document.head.appendChild(icons);
+  }
+
   Promise.all([
     inject("site-disclaimer-slot", "partials/disclaimer.html?v=" + Date.now()),
     inject("site-header-slot", "partials/header.html?v=" + Date.now()),
