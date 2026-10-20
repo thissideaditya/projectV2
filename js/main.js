@@ -269,12 +269,20 @@
   // need the real header/footer markup in the DOM first — which
   // partials.js injects asynchronously — so they run off this event
   // instead of DOMContentLoaded. See js/partials.js.
-  document.addEventListener("ada:partials-loaded", function () {
+  var partialsReady = false;
+  function onPartials() {
+    if (partialsReady) return; // run once
+    partialsReady = true;
     initDisclaimer(); // the gate itself now lives in partials/disclaimer.html
     initNav();
     markActiveLink();
     setYear();
-  });
+  }
+  document.addEventListener("ada:partials-loaded", onPartials);
+  // Safety net: if the partials were already announced before this script
+  // ran, don't wait for an event that has been and gone (that left the page
+  // blurred with no disclaimer card).
+  if (window.__adaPartialsLoaded) onPartials();
 })();
 
 /* ===================================================================

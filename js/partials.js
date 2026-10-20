@@ -58,9 +58,21 @@
     inject("site-header-slot", "partials/header.html?v=" + Date.now()),
     inject("site-footer-slot", "partials/footer.html?v=" + Date.now()),
   ]).then(function () {
-    // main.js listens for this to run nav toggling, active-link
-    // highlighting, and the footer year — all of which need the
+    // main.js listens for this to run the disclaimer gate, nav toggling,
+    // active-link highlighting and the footer year — all of which need the
     // real header/footer markup to exist in the page first.
-    document.dispatchEvent(new Event("ada:partials-loaded"));
+    //
+    // Fire it only once the page's own scripts have run. This file is the
+    // first script on every page; the partials can finish downloading while
+    // the browser is still fetching main.js (and, on the home page, four
+    // other scripts before it). Announcing then reached no listener: the page
+    // stayed blurred by "disclaimer-active" above with no disclaimer card,
+    // until a reload. Plain <script> tags all run before DOMContentLoaded.
+    function announce() {
+      window.__adaPartialsLoaded = true;
+      document.dispatchEvent(new Event("ada:partials-loaded"));
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", announce, { once: true });
+    else announce();
   });
 })();
