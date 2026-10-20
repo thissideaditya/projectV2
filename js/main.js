@@ -185,7 +185,7 @@
   });
 
   // <a href="#id" data-open="id">: jump to that card and open its Read More
-  // details (Practice Areas: the GST / Income Tax cards point at their full service).
+  // details (Services page: the GST / Income Tax cards point at their full service).
   document.addEventListener("click", function (e) {
     var link = e.target.closest && e.target.closest("a[data-open]");
     if (!link) return;

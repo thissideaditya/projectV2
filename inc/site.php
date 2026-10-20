@@ -133,7 +133,7 @@ function site_breadcrumb_trail(string $page): ?array
         'about'           => [['About Us', null]],
         'team'            => [$about, ['Our Team', null]],
         'pro-bono'        => [$about, ['Pro Bono', null]],
-        'practice-areas'  => [['Practice Areas', null]],
+        'practice-areas'  => [['Services', null]],
         'insights'        => [['Insights', null]],
         'rules'           => [$insights, ['Rules', null]],
         'thoughts'        => [$insights, ['Thoughts', null]],
