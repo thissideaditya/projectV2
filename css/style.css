@@ -460,6 +460,51 @@ body.disclaimer-active > *:not(.disclaimer-overlay) { filter: blur(6px); }
 .cta-band { background: var(--gold-500); color: var(--green-950); text-align: center; }
 .cta-band h2 { color: var(--green-950); }
 
+/* Home: "View Our Services" band (replaced the old "What We Do" card grid).
+   Gold pill with a soft pulsing halo, a shine that sweeps across every few
+   seconds and an arrow that nudges forward; lifts on hover. */
+.svc-cta { padding: clamp(2.75rem, 6vw, 4.5rem) 0; background: var(--cream-100); }
+.svc-cta .container { display: flex; align-items: center; justify-content: center; gap: clamp(1rem, 3vw, 2rem); }
+.svc-cta .container::before, .svc-cta .container::after { content: ""; flex: 1; max-width: 220px; height: 1px; }
+.svc-cta .container::before { background: linear-gradient(90deg, transparent, var(--gold-500)); }
+.svc-cta .container::after { background: linear-gradient(270deg, transparent, var(--gold-500)); }
+.svc-cta-btn {
+  position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 1.1rem; flex: none;
+  padding: .7rem .75rem .7rem 2rem; border-radius: 999px; overflow: hidden;
+  background: linear-gradient(135deg, var(--gold-400), var(--gold-500) 55%, var(--gold-600));
+  color: var(--green-950); text-decoration: none; font-family: var(--font-display); font-weight: 600; font-size: clamp(1.1rem, 2vw, 1.3rem);
+  box-shadow: 0 14px 30px -14px rgba(122, 92, 18, .7), inset 0 1px 0 rgba(255, 255, 255, .35);
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+  animation: svc-cta-halo 2.6s ease-out infinite;
+}
+/* Shine sweeping across */
+.svc-cta-btn::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 45%; z-index: -1; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .55), transparent); transform: skewX(-20deg);
+  animation: svc-cta-shine 3.6s ease-in-out infinite;
+}
+.svc-cta-go {
+  display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%;
+  background: var(--green-950); color: var(--gold-400); font-size: 1.2rem;
+  transition: transform .35s var(--ease);
+}
+.svc-cta-go i { animation: svc-cta-nudge 1.8s var(--ease) infinite; }
+.svc-cta-btn:hover, .svc-cta-btn:focus-visible { transform: translateY(-3px); box-shadow: 0 22px 40px -16px rgba(122, 92, 18, .8), inset 0 1px 0 rgba(255, 255, 255, .35); }
+.svc-cta-btn:hover .svc-cta-go, .svc-cta-btn:focus-visible .svc-cta-go { transform: translateX(4px) rotate(-45deg); }
+.svc-cta-btn:focus-visible { outline: 2px solid var(--green-950); outline-offset: 4px; }
+@keyframes svc-cta-halo {
+  0% { box-shadow: 0 14px 30px -14px rgba(122, 92, 18, .7), inset 0 1px 0 rgba(255, 255, 255, .35), 0 0 0 0 rgba(201, 162, 39, .45); }
+  100% { box-shadow: 0 14px 30px -14px rgba(122, 92, 18, .7), inset 0 1px 0 rgba(255, 255, 255, .35), 0 0 0 16px rgba(201, 162, 39, 0); }
+}
+@keyframes svc-cta-shine { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+@keyframes svc-cta-nudge { 0%, 60%, 100% { transform: none; } 30% { transform: translateX(4px); } }
+.svc-cta-btn:hover { animation-play-state: paused; }
+@media (max-width: 520px) { .svc-cta .container::before, .svc-cta .container::after { max-width: 40px; } }
+@media (prefers-reduced-motion: reduce) {
+  .svc-cta-btn, .svc-cta-btn::before, .svc-cta-go i { animation: none; }
+  .svc-cta-btn::before { display: none; }
+}
+
 /* Home: "For more GST related information" band below the videos */
 .gst-more { background: var(--green-950); color: var(--cream-100); padding: clamp(1.75rem, 4vw, 2.5rem) 0; border-top: 1px solid rgba(220, 184, 74, .35); border-bottom: 1px solid rgba(220, 184, 74, .35); }
 .gst-more-inner { display: flex; align-items: center; justify-content: center; gap: 1.25rem 1.5rem; flex-wrap: wrap; text-align: center; }
