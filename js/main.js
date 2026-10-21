@@ -222,6 +222,22 @@
     });
   });
 
+  // Team page profiles (.rm-card): the card shows the first lines of its
+  // .rm-text (CSS line-clamp) and hides its .rm-extra; the .rm-toggle button
+  // at its foot opens/closes the full profile.
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest(".rm-toggle");
+    if (!btn) return;
+    var card = btn.closest(".rm-card");
+    if (!card) return;
+    var open = !card.classList.contains("is-open");
+    card.classList.toggle("is-open", open);
+    btn.setAttribute("aria-expanded", String(open));
+    btn.textContent = open ? "Read Less" : "Read More";
+    // Closing a long profile can leave the button above the screen; bring it back
+    if (!open && btn.getBoundingClientRect().top < 0) btn.scrollIntoView({ block: "center" });
+  });
+
   // <a href="#id" data-open="id">: jump to that card and open its Read More
   // details (Services page: the GST / Income Tax cards point at their full service).
   document.addEventListener("click", function (e) {
