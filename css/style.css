@@ -2057,6 +2057,11 @@ body.disclaimer-active .cookie-banner { display: none; }
 .magazine-cover-issue { align-self: center; padding-top: .8rem; border-top: 1px solid rgba(230, 201, 110, .5); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-400); }
 .magazine-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-bottom: .25rem; }
 .feed-section--magazines .empty-state { max-width: 640px; margin: 0 auto; background: rgba(255, 253, 248, .7); }
+/* Single issue page (magazine.php): cover beside the details. */
+.magazine-page { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: clamp(1.75rem, 5vw, 3.5rem); align-items: start; max-width: 1000px; margin: 1.5rem auto 0; }
+.magazine-page .magazine-cover { border-radius: 6px; border: 1px solid rgba(201, 162, 39, .3); box-shadow: var(--shadow-card); }
+.magazine-page .lede { margin-bottom: 1.75rem; }
+@media (max-width: 760px) { .magazine-page { grid-template-columns: 1fr; } .magazine-page .magazine-cover { max-width: 320px; } }
 
 .video-play { /* round gold-ringed play button, centred on the thumbnail */
   position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; translate: -50% -50%; border-radius: 50%;

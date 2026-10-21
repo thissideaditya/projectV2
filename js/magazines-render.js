@@ -65,7 +65,9 @@
           (m.description ? "<p>" + escapeHtml(m.description) + "</p>" : "") +
           '<div class="magazine-actions">' +
             '<a class="btn btn--sm btn--outline-dark" href="' + url + '" download="' + fileName + '">Download &darr;</a>' +
-            (window.ADA_SHARE ? window.ADA_SHARE.button(m.file_url, m.title) : "") +
+            // Shares the issue's own page (magazine.php), whose og:image is the cover,
+            // so WhatsApp etc. show a preview picture; a bare PDF link has none.
+            (window.ADA_SHARE ? window.ADA_SHARE.button("magazine.php?slug=" + encodeURIComponent(m.slug), m.title) : "") +
           "</div>" +
           '<a class="feed-more" href="' + url + '" target="_blank" rel="noopener">Read Magazine' + ARROW + "</a>" +
         "</div>" +

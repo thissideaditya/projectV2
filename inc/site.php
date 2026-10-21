@@ -346,7 +346,7 @@ function site_magazine_card(array $m): string
         .   ($m['description'] ? '<p>' . e($m['description']) . '</p>' : '')
         .   '<div class="magazine-actions">'
         .     '<a class="btn btn--sm btn--outline-dark" href="' . e($url) . '" download="' . e($fileName) . '">Download &darr;</a>'
-        .     site_share_button($url, $m['title'])
+        .     site_share_button('magazine.php?slug=' . rawurlencode($m['slug']), $m['title']) // the issue's page has the cover as og:image
         .   '</div>'
         .   '<a class="feed-more" href="' . e($url) . '" target="_blank" rel="noopener">Read Magazine' . SITE_FEED_ARROW . '</a>'
         . '</div>'
