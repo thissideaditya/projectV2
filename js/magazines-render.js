@@ -10,7 +10,7 @@
 (function () {
   "use strict";
 
-  var HOME_COUNT = 3;
+  var HOME_COUNT = 6;
 
   // Escapes text for HTML, including inside attribute values ("…").
   function escapeHtml(str) {
@@ -36,6 +36,10 @@
   var ARROW =
     '<span class="feed-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ' +
     'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>';
+
+  var DOWN =
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M6 13l6 6 6-6"/></svg>';
 
   function cover(m) {
     if (m.cover_image) {
@@ -64,7 +68,7 @@
           '<h3><a href="' + url + '" target="_blank" rel="noopener">' + escapeHtml(m.title) + "</a></h3>" +
           (m.description ? "<p>" + escapeHtml(m.description) + "</p>" : "") +
           '<div class="magazine-actions">' +
-            '<a class="btn btn--sm btn--outline-dark" href="' + url + '" download="' + fileName + '">Download &darr;</a>' +
+            '<a class="btn btn--sm btn--outline-dark magazine-download" href="' + url + '" download="' + fileName + '">Download' + DOWN + "</a>" +
             (window.ADA_SHARE ? window.ADA_SHARE.button(m.file_url, m.title) : "") +
           "</div>" +
           '<a class="feed-more" href="' + url + '" target="_blank" rel="noopener">Read Magazine' + ARROW + "</a>" +
@@ -73,8 +77,63 @@
     );
   }
 
+  // Home section: the cards scroll sideways (CSS scroll-snap); the arrows move
+  // one card at a time and there is one dot per scroll stop. Controls stay
+  // hidden while every card already fits on screen.
+  function carousel(track) {
+    var wrap = track.closest(".mag-carousel");
+    if (!wrap) return;
+    var prev = wrap.querySelector(".mag-nav--prev");
+    var next = wrap.querySelector(".mag-nav--next");
+    var dotsBox = wrap.parentNode.querySelector(".mag-dots");
+    var cards = track.querySelectorAll(".magazine-card");
+    if (!cards.length) return;
+
+    function step() {
+      return cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth;
+    }
+    function stops() {
+      return Math.max(1, Math.round((track.scrollWidth - track.clientWidth) / step()) + 1);
+    }
+    function current() {
+      return Math.min(stops() - 1, Math.round(track.scrollLeft / step()));
+    }
+    function go(i) {
+      track.scrollTo({ left: i * step(), behavior: "smooth" });
+    }
+
+    function update() {
+      var n = stops(), i = current();
+      var on = n > 1;
+      prev.hidden = next.hidden = dotsBox.hidden = !on;
+      prev.disabled = i <= 0;
+      next.disabled = i >= n - 1;
+      if (dotsBox.children.length !== n) {
+        dotsBox.innerHTML = "";
+        for (var d = 0; d < n; d++) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.setAttribute("aria-label", "Show magazine " + (d + 1));
+          b.addEventListener("click", go.bind(null, d));
+          dotsBox.appendChild(b);
+        }
+      }
+      for (var k = 0; k < dotsBox.children.length; k++) {
+        dotsBox.children[k].setAttribute("aria-current", k === i ? "true" : "false");
+      }
+    }
+
+    prev.addEventListener("click", function () { go(current() - 1); });
+    next.addEventListener("click", function () { go(current() + 1); });
+    var raf;
+    function queue() { cancelAnimationFrame(raf); raf = requestAnimationFrame(update); }
+    track.addEventListener("scroll", queue, { passive: true });
+    window.addEventListener("resize", queue);
+    update();
+  }
+
   async function render(mount, limit, emptyHtml) {
-    if (mount.hasAttribute("data-ssr")) return; // already rendered on the server (inc/site.php)
+    if (mount.hasAttribute("data-ssr")) return carousel(mount); // already rendered on the server (inc/site.php)
     try {
       // Never hang on "Loading…": give up after 15s and show a clear message.
       var magazines = await Promise.race([
@@ -89,6 +148,7 @@
       }
       mount.className = "grid post-grid feed-grid magazine-grid";
       mount.innerHTML = magazines.map(magazineCard).join("");
+      carousel(mount);
     } catch (err) {
       mount.innerHTML = '<div class="empty-state">Unable to load magazines right now.</div>';
       console.error(err);

@@ -345,7 +345,8 @@ function site_magazine_card(array $m): string
         .   '<h3><a href="' . e($url) . '" target="_blank" rel="noopener">' . e($m['title']) . '</a></h3>'
         .   ($m['description'] ? '<p>' . e($m['description']) . '</p>' : '')
         .   '<div class="magazine-actions">'
-        .     '<a class="btn btn--sm btn--outline-dark" href="' . e($url) . '" download="' . e($fileName) . '">Download &darr;</a>'
+        .     '<a class="btn btn--sm btn--outline-dark magazine-download" href="' . e($url) . '" download="' . e($fileName) . '">Download'
+        .       '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M6 13l6 6 6-6"/></svg></a>'
         .     site_share_button($url, $m['title'])
         .   '</div>'
         .   '<a class="feed-more" href="' . e($url) . '" target="_blank" rel="noopener">Read Magazine' . SITE_FEED_ARROW . '</a>'
@@ -414,7 +415,7 @@ function site_render_lists(string $html, string $page): string
 {
     switch ($page) {
         case 'index':
-            return site_render_magazines($html, 'home-magazines', 3, 'Our first issue is on its way. Please check back soon.');
+            return site_render_magazines($html, 'home-magazines', 6, 'Our first issue is on its way. Please check back soon.');
         case 'magazines':
             return site_render_magazines($html, 'magazines-listing', 0, 'No magazines published yet. Please check back soon.');
         case 'rules':
