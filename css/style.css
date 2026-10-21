@@ -779,11 +779,29 @@ body.disclaimer-active > *:not(.disclaimer-overlay) { filter: blur(6px); }
   display: flex; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
   font-size: .78rem; color: rgba(244,233,201,.6);
 }
+/* Legal links row (Sitemap / Terms / Privacy / Cookies): inline, divided by thin gold rules */
+.footer-legal { padding: 1.4rem 0; border-top: 1px solid rgba(250,247,239,.14); }
+.footer-legal ul { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; list-style: none; margin: 0; padding: 0; row-gap: .5rem; }
+.footer-legal li { display: flex; align-items: center; }
+.footer-legal li + li::before {
+  content: ""; width: 1px; height: 1em; margin: 0 1.4rem; background: rgba(220,184,74,.55);
+}
+.footer-legal a {
+  position: relative; font-size: .87rem;
+  color: rgba(244,233,201,.8); padding: .2rem 0;
+}
+.footer-legal a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: var(--gold-400); transform: scaleX(0); transform-origin: left; transition: transform .25s ease;
+}
+.footer-legal a:hover, .footer-legal a:focus-visible { color: var(--gold-400); }
+.footer-legal a:hover::after, .footer-legal a:focus-visible::after { transform: scaleX(1); }
 @media (max-width: 760px) {
   .footer-top { text-align: center; justify-items: center; }
   .footer-brand .brand { justify-content: center; }
   .footer-brand p { margin-left: auto; margin-right: auto; }
   .footer-bottom { justify-content: center; text-align: center; }
+  .footer-legal li + li::before { margin: 0 .8rem; }
 }
 
 /* ---------------------------------------------------------------
@@ -1474,6 +1492,44 @@ a.card { display: block; cursor: pointer; }
 
 /* Hide while the disclaimer gate is up so it isn't tappable under the blur */
 body.disclaimer-active .floating-contact { display: none; }
+
+/* ---------------------------------------------------------------
+   COOKIE CONSENT BANNER (built by js/main.js)
+--------------------------------------------------------------- */
+.cookie-banner {
+  position: fixed; left: clamp(1rem, 4vw, 1.75rem); bottom: clamp(1rem, 4vw, 1.75rem); z-index: 450;
+  width: min(380px, calc(100vw - 2rem)); padding: 1.4rem 1.5rem 1.3rem;
+  background: var(--green-950); color: rgba(244,233,201,.8);
+  border: 1px solid rgba(201,162,39,.35); border-radius: var(--radius-md);
+  box-shadow: 0 24px 48px -20px rgba(0,0,0,.55);
+  opacity: 0; transform: translateY(16px); pointer-events: none;
+  transition: opacity .4s var(--ease), transform .4s var(--ease);
+}
+.cookie-banner::before { /* gold hairline across the top */
+  content: ""; position: absolute; top: -1px; left: 1.5rem; right: 1.5rem; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-400), transparent);
+}
+.cookie-banner.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+.cookie-eyebrow {
+  display: block; margin-bottom: .55rem;
+  font-family: var(--font-caption); font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-400);
+}
+.cookie-banner p { margin: 0 0 1.1rem; font-size: .92rem; line-height: 1.6; }
+.cookie-actions { display: flex; align-items: center; gap: 1.25rem; }
+.cookie-actions .btn { padding: .6em 1.5em; font-size: .85rem; }
+.cookie-link {
+  font-size: .85rem; color: var(--cream-50);
+  border-bottom: 1px solid rgba(220,184,74,.5); padding-bottom: 1px; transition: color .2s ease, border-color .2s ease;
+}
+.cookie-link:hover { color: var(--gold-400); border-color: var(--gold-400); }
+body.disclaimer-active .cookie-banner { display: none; }
+@media (max-width: 760px) {
+  /* full-width strip above the floating WhatsApp / email buttons */
+  .cookie-banner { left: 1rem; right: 1rem; width: auto; bottom: calc(1rem + 2 * 50px + 1.5rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cookie-banner { transition: none; transform: none; }
+}
 
 /* ---------------------------------------------------------------
    MISC UTILITIES

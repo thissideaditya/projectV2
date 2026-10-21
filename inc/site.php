@@ -144,6 +144,8 @@ function site_breadcrumb_trail(string $page): ?array
         'careers'         => [['Careers', null]],
         'contact'         => [['Contact Us', null]],
         'privacy'         => [['Privacy Policy', null]],
+        'terms'           => [['Terms of Use', null]],
+        'sitemap'         => [['Sitemap', null]],
     ];
     return $trails[$page] ?? null;
 }

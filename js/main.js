@@ -205,6 +205,43 @@
   });
 
   /* -------------------------------------------------------------
+     4b. COOKIE CONSENT BANNER
+     Small card, bottom-left, shown after the disclaimer is closed
+     until the visitor accepts (remembered in localStorage). The site
+     only uses essential storage, so there's a single "Accept".
+  ------------------------------------------------------------- */
+  var COOKIE_KEY = "ada_cookie_consent";
+
+  function initCookieBanner() {
+    try { if (localStorage.getItem(COOKIE_KEY)) return; } catch (e) {}
+    if (document.querySelector(".cookie-banner")) return;
+
+    var banner = document.createElement("div");
+    banner.className = "cookie-banner";
+    banner.setAttribute("role", "region");
+    banner.setAttribute("aria-label", "Cookie notice");
+    banner.innerHTML =
+      '<span class="cookie-eyebrow">Cookies</span>' +
+      '<p>We use only essential cookies and storage to keep this website working. ' +
+        'No tracking, no advertising.</p>' +
+      '<div class="cookie-actions">' +
+        '<button type="button" class="btn btn--gold cookie-accept">Accept</button>' +
+        '<a href="privacy.html#cookies" class="cookie-link">Cookie Statement</a>' +
+      '</div>';
+    document.body.appendChild(banner);
+    requestAnimationFrame(function () { banner.classList.add("is-visible"); });
+
+    banner.querySelector(".cookie-accept").addEventListener("click", function () {
+      try { localStorage.setItem(COOKIE_KEY, "accepted"); } catch (e) {}
+      banner.classList.remove("is-visible");
+      setTimeout(function () { banner.remove(); }, 400);
+    });
+  }
+
+  if (window.__adaDisclaimerDone) setTimeout(initCookieBanner, 600);
+  else document.addEventListener("ada:disclaimer-closed", function () { setTimeout(initCookieBanner, 600); }, { once: true });
+
+  /* -------------------------------------------------------------
     5. READ MORE / READ LESS TOGGLES — every page. Markup: the hidden
        extra content, then <button class="read-more-toggle"> right
        after it, so "Read Less" always sits under the expanded text.

@@ -34,6 +34,8 @@ $pages = [
     'careers.html'         => ['monthly', '0.5'],
     'contact.html'         => ['yearly',  '0.7'],
     'privacy.html'         => ['yearly',  '0.2'],
+    'terms.html'           => ['yearly',  '0.2'],
+    'sitemap.html'         => ['monthly', '0.3'],
 ];
 
 $urls = [];
