@@ -94,12 +94,12 @@
       <article class="tm-card">
         <div class="tm-photo">
           <img src="assets/images/ankitaImage.webp" alt="Adv. Ankita Jha" loading="lazy">
-          <span class="tm-pill">Legal Practitioner</span>
+          <span class="tm-pill">Advocate</span>
         </div>
         <div class="tm-body">
           <h3>Adv. Ankita Jha</h3>
-          <span class="tm-role">Legal Practitioner</span>
-          <p>A dynamic legal practitioner whose practice centres on GST matters, civil litigation, insurance disputes, and corporate compliance. She has built genuine drafting fluency — GST replies, appeals, and GSTAT filings, alongside pleadings — and applies the same precision to insurance claims and MACT cases. A committed proponent of Alternative Dispute Resolution, steering matters toward mediation and arbitration wherever that route serves the client better than protracted litigation.</p>
+          <span class="tm-role">Advocate</span>
+          <p>A dynamic advocate whose practice centres on GST matters, civil litigation, insurance disputes, and corporate compliance. She has built genuine drafting fluency — GST replies, appeals, and GSTAT filings, alongside pleadings — and applies the same precision to insurance claims and MACT cases. A committed proponent of Alternative Dispute Resolution, steering matters toward mediation and arbitration wherever that route serves the client better than protracted litigation.</p>
           <ul class="tm-highlights">
             <li><span class="tm-hi-icon" aria-hidden="true"><i class="ti ti-gavel"></i></span><span>GST replies, appeals, and GSTAT filings; civil litigation and pleadings</span></li>
             <li><span class="tm-hi-icon" aria-hidden="true"><i class="ti ti-file-text"></i></span><span>Insurance disputes and Motor Accident Claims Tribunal (MACT) matters</span></li>
@@ -167,8 +167,9 @@
       <h2 class="section-title">Working alongside our Chambers</h2>
       <div class="divider-gold"></div>
     </div>
-    <div class="grid grid--3">
-      <a class="card card--photo" href="https://ashvalegal.com/" target="_blank" rel="noopener">
+    <!-- Each card: intro visible, highlights behind "Read More" (toggle: js/main.js) -->
+    <div class="grid grid--3 firm-grid">
+      <div class="card card--photo">
         <span class="card-bg" aria-hidden="true"><img src="assets/images/cards/ashva-legal.svg" alt="" loading="lazy"></span>
         <div class="card-head">
           <div class="card-icon"><i class="ti ti-building" aria-hidden="true"></i></div>
@@ -176,13 +177,15 @@
         </div>
         <span class="num">Associated Firm &middot; Est. 2017</span>
         <p>Founded in 2017 by Dr. Avinash Poddar and Ms. Anchal Poddar, Advocates, with its registered office in Surat and offices and associates positioned across India. Adv. Ashu Dalmia is named in the firm's core team, reflecting a working relationship that gives clients access to specialist capability beyond what either practice would offer alone.</p>
-        <ul class="bio-highlights">
+        <ul class="bio-highlights" hidden>
           <li>Corporate law, direct and indirect taxation, PMLA, Benami and black money laws</li>
           <li>Insolvency and Bankruptcy Code, arbitration, and RERA</li>
           <li>Customs, criminal law, and intellectual property</li>
           <li>Associates and offices positioned across India</li>
         </ul>
-      </a>
+        <button type="button" class="read-more-toggle" aria-expanded="false">Read More</button>
+        <a class="firm-link" href="https://ashvalegal.com/" target="_blank" rel="noopener">Visit website <i class="ti ti-external-link" aria-hidden="true"></i></a>
+      </div>
       <!-- No link: varindia.net has no working website (invalid SSL certificate; http redirects to a mail login). -->
       <div class="card card--photo">
         <span class="card-bg" aria-hidden="true"><img src="assets/images/cards/var-associates.svg" alt="" loading="lazy"></span>
@@ -192,12 +195,13 @@
         </div>
         <span class="num">Associated Firm &middot; Est. 1997</span>
         <p>A firm of Chartered Accountants established on 20 October 1997 and based in Delhi — nearly three decades of continuous practice in a field that has changed considerably around it, most notably with the introduction of GST itself.</p>
-        <ul class="bio-highlights">
+        <ul class="bio-highlights" hidden>
           <li>GST advisory, consultancy, and litigation — core practice since GST implementation</li>
           <li>Audit and assurance, and routine statutory compliance</li>
           <li>GST health checks and reviews — proactive exposure identification</li>
           <li>Input tax credit and refund work — technical depth in ITC and refund positions</li>
         </ul>
+        <button type="button" class="read-more-toggle" aria-expanded="false">Read More</button>
       </div>
       <!-- No link yet: this LLP has no website of its own. -->
       <div class="card card--photo">
@@ -208,11 +212,12 @@
         </div>
         <span class="num">Associated Firm</span>
         <p>A limited liability partnership formed through the collaboration of Ashva Legal and ADA, constituted specifically to extend specialised legal services across Uttarakhand. It delivers expert counsel and representation in the firm's core services, giving clients in the region the same standards of professional excellence and client-centric approach that characterise the associated network.</p>
-        <ul class="bio-highlights">
+        <ul class="bio-highlights" hidden>
           <li>Dedicated Uttarakhand presence for the ADA network</li>
           <li>Same core services as ADA Law Chambers</li>
           <li>Part of the wider associated-firm network</li>
         </ul>
+        <button type="button" class="read-more-toggle" aria-expanded="false">Read More</button>
       </div>
     </div>
   </div>

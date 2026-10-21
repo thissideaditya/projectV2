@@ -10,7 +10,7 @@
   var EXPERTS = [
     { name: "Ashu Dalmia", role: "FOUNDER · CHARTERED ACCOUNTANT & ADVOCATE", img: "/assets/images/ashuImage.webp" },
     { name: "Smita Raj", role: "Tax PROFESSIONAL", img: "/assets/images/smitaImage.webp" },
-    { name: "Adv. Ankita Jha", role: "LEGAL PRACTITIONER", img: "/assets/images/ankitaImage.webp" },
+    { name: "Adv. Ankita Jha", role: "ADVOCATE", img: "/assets/images/ankitaImage.webp" },
     { name: "Ishu Bharti Jha", role: "MANAGER · ASSOCIATE", img: "/assets/images/ishuImage.webp" },
     { name: "Neelam ", role: "Advocate", img: "/assets/images/neelamImage.webp" },
     { name: "Anshu Kumar Upadhyay", role: "ADVOCATE", img: "/assets/images/anshuImage.webp" },
