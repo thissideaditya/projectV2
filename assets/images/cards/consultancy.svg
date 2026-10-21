@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+<defs>
+<radialGradient id="bg" cx="62%" cy="38%" r="85%"><stop offset="0" stop-color="#fdf9ef"/><stop offset="1" stop-color="#e6d5aa"/></radialGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecd384"/><stop offset="1" stop-color="#b08a1c"/></linearGradient>
+<filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#3d2f08" flood-opacity=".28"/></filter>
+</defs>
+<rect width="600" height="600" fill="url(#bg)"/>
+<path d="M-40 540C110 230 360 70 650 40" fill="none" stroke="#c9a227" stroke-width="2.5" opacity=".55"/>
+<ellipse cx="300" cy="505" rx="230" ry="26" fill="#7a5c12" opacity=".13"/>
+<g filter="url(#sh)">
+<path d="M150 206Q150 190 166 190H206Q222 190 222 206V230H150Z" fill="#164534"/><text x="186" y="218" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="700" letter-spacing="1" fill="#fbf7ec" text-anchor="middle">ITC</text><path d="M222 206Q222 190 238 190H278Q294 190 294 206V230H222Z" fill="#2f6b52"/><text x="258" y="218" font-family="Georgia, 'Times New Roman', serif" font-size="9.5" font-weight="700" letter-spacing="0" fill="#fbf7ec" text-anchor="middle">VALUATION</text><path d="M294 206Q294 190 310 190H350Q366 190 366 206V230H294Z" fill="#9a7a17"/><text x="330" y="218" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="700" letter-spacing="1" fill="#fbf7ec" text-anchor="middle">RCM</text><path d="M366 206Q366 190 382 190H422Q438 190 438 206V230H366Z" fill="#0c281d"/><text x="402" y="218" font-family="Georgia, 'Times New Roman', serif" font-size="12" font-weight="700" letter-spacing="1" fill="#fbf7ec" text-anchor="middle">EXPORT</text>
+<rect x="130" y="226" width="340" height="240" rx="10" fill="#d9c48f"/><rect x="150" y="246" width="300" height="200" fill="#fbf7ec" stroke="#d2c39b" stroke-width="2"/>
+<text x="176" y="284" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="700" letter-spacing="2" fill="#164534" text-anchor="start">LEGAL OPINION</text>
+<text x="176" y="314" font-family="Georgia, 'Times New Roman', serif" font-size="11" font-style="italic" letter-spacing="1" fill="#9a7a17" text-anchor="start">Query</text><path d="M224 310h190" stroke="#d2c39b" stroke-width="6" stroke-linecap="round"/>
+<text x="176" y="344" font-family="Georgia, 'Times New Roman', serif" font-size="11" font-style="italic" letter-spacing="1" fill="#9a7a17" text-anchor="start">Analysis</text><path d="M240 340h165" stroke="#d2c39b" stroke-width="6" stroke-linecap="round"/><path d="M176 364h220" stroke="#d2c39b" stroke-width="6" stroke-linecap="round"/>
+<text x="176" y="394" font-family="Georgia, 'Times New Roman', serif" font-size="11" font-style="italic" letter-spacing="1" fill="#9a7a17" text-anchor="start">Advice</text><path d="M230 390h150" stroke="#d2c39b" stroke-width="6" stroke-linecap="round"/>
+<path d="M178 426c10-14 18-14 20-2s10 6 16-4 12-6 14 2 10 2 18-6" fill="none" stroke="#164534" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="440" cy="440" r="52" fill="url(#gold)"/><circle cx="440" cy="440" r="42" fill="none" stroke="#9a7a17" stroke-width="3"/>
+<g transform="rotate(215 440 440)" fill="#0c281d"><path d="M440 410c-11 12-15 26-11 38l7 14h8l7-14c4-12 0-26-11-38z"/><rect x="432" y="462" width="16" height="10" rx="2"/><circle cx="440" cy="440" r="3.5" fill="url(#gold)"/><path d="M440 443.5v15" stroke="url(#gold)" stroke-width="1.6"/></g>
+</g>
+</svg>
