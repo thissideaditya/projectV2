@@ -34,20 +34,86 @@
       if (session) window.location.href = "dashboard.html";
     });
 
+    var otpForm = document.getElementById("otp-form");
+    var otpInput = document.getElementById("otp");
+    var otpInfo = document.getElementById("otp-info");
+    var errorBox = document.getElementById("login-error");
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.hidden = false;
+    }
+
+    function showOtpStep(sentTo) {
+      form.hidden = true;
+      otpForm.hidden = false;
+      otpInfo.textContent = "A 6-digit code has been emailed to " + (sentTo || "the admin inbox") + ". It expires in 10 minutes.";
+      otpInput.value = "";
+      otpInput.focus();
+    }
+
+    function showPasswordStep() {
+      otpForm.hidden = true;
+      form.hidden = false;
+      document.getElementById("password").value = "";
+      document.getElementById("password").focus();
+    }
+
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
       var email = document.getElementById("email").value.trim();
       var password = document.getElementById("password").value;
-      var errorBox = document.getElementById("login-error");
+      var btn = form.querySelector("button[type=submit]");
       errorBox.hidden = true;
+      btn.disabled = true;
 
       try {
-        await window.ADA.data.signIn(email, password);
+        var res = await window.ADA.data.signIn(email, password);
+        showOtpStep(res && res.sent_to);
+      } catch (err) {
+        showError(err.message || "Unable to sign in.");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    otpForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var btn = otpForm.querySelector("button[type=submit]");
+      errorBox.hidden = true;
+      btn.disabled = true;
+      try {
+        await window.ADA.data.verifyOtp(otpInput.value.trim());
         window.location.href = "dashboard.html";
       } catch (err) {
-        errorBox.textContent = err.message || "Unable to sign in.";
-        errorBox.hidden = false;
+        var msg = err.message || "Unable to verify the code.";
+        showError(msg);
+        // Expired / too many tries: the server dropped the pending sign-in.
+        if (/sign in again|expired/i.test(msg)) showPasswordStep();
+        else { otpInput.select(); }
+      } finally {
+        btn.disabled = false;
       }
+    });
+
+    document.getElementById("otp-resend").addEventListener("click", async function (e) {
+      e.preventDefault();
+      errorBox.hidden = true;
+      try {
+        var res = await window.ADA.data.resendOtp();
+        showOtpStep(res && res.sent_to);
+        otpInfo.textContent = "A new code has been emailed to " + (res && res.sent_to || "the admin inbox") + ".";
+      } catch (err) {
+        var msg = err.message || "Could not resend the code.";
+        showError(msg);
+        if (/sign in again|expired/i.test(msg)) showPasswordStep();
+      }
+    });
+
+    document.getElementById("otp-back").addEventListener("click", function (e) {
+      e.preventDefault();
+      errorBox.hidden = true;
+      showPasswordStep();
     });
   }
 

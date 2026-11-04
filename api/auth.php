@@ -2,7 +2,11 @@
 /**
  * ADA LAW Chambers — api/auth.php
  * ---------------------------------------------------------------
- * POST ?action=login   { email, password }  -> logs in, sets a session
+ * POST ?action=login   { email, password }  -> checks the password, then
+ *                                             emails a one-time code (OTP)
+ *                                             to OTP_EMAIL
+ * POST ?action=verify_otp { code }          -> checks the code, sets the session
+ * POST ?action=resend_otp                   -> emails a fresh code
  * POST ?action=logout                       -> logs out
  * GET  ?action=check                        -> returns current session, if any
  * POST ?action=change_password { current_password, new_password }  (signed in)
@@ -50,6 +54,78 @@ function login_clear(string $key): void
     @unlink(login_bucket_file($key));
 }
 
+// ---------------------------------------------------------------
+// Email OTP — second sign-in step. After the password is accepted, a
+// 6-digit code is emailed to OTP_EMAIL and must be entered within
+// 10 minutes (5 tries per code; a new code at most once a minute).
+// Only a hash of the code is kept, in the visitor's server-side session.
+// ---------------------------------------------------------------
+const OTP_EMAIL = 'adadesk@gmail.com';
+const OTP_LENGTH = 6;
+const OTP_TTL = 10 * 60;
+const OTP_MAX_TRIES = 5;
+const OTP_RESEND_GAP = 60;
+const OTP_MAX_SENDS = 5;
+
+/** Makes a new code, stores its hash in the session and emails it. */
+function otp_issue(): bool
+{
+    $code = str_pad((string) random_int(0, 10 ** OTP_LENGTH - 1), OTP_LENGTH, '0', STR_PAD_LEFT);
+    $_SESSION['otp'] = [
+        'hash' => hash('sha256', $code),
+        'expires' => time() + OTP_TTL,
+        'tries' => 0,
+        'sent_at' => time(),
+        'sends' => ($_SESSION['otp']['sends'] ?? 0) + 1,
+    ];
+    return otp_send_email($code, (string) ($_SESSION['otp_pending']['email'] ?? ''));
+}
+
+/**
+ * Emails the code. Uses the server's own mail() first (Hostinger
+ * supports it); if that fails, falls back to FormSubmit (api/notify.php),
+ * which needs a one-time "Activate" click for OTP_EMAIL.
+ */
+function otp_send_email(string $code, string $adminEmail): bool
+{
+    $minutes = (int) (OTP_TTL / 60);
+    $when = date('d M Y, H:i');
+    $ip = client_ip();
+    $subject = "ADA Law Chambers admin sign-in code: $code";
+    $text = "Your admin panel sign-in code is:\n\n    $code\n\n"
+        . "It expires in $minutes minutes and can be used once.\n\n"
+        . "Account: $adminEmail\nTime: $when\nIP address: $ip\n\n"
+        . "If you did not just try to sign in, someone knows the admin password — change it from the Account page.\n";
+
+    $host = preg_replace('~^www\.~', '', strtolower(preg_replace('~:\d+$~', '', (string) ($_SERVER['HTTP_HOST'] ?? 'adalawchambers.com'))));
+    if (!preg_match('~^[a-z0-9.-]+$~', $host)) $host = 'adalawchambers.com';
+    $headers = implode("\r\n", [
+        "From: ADA Law Chambers <no-reply@$host>",
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'X-Auto-Response-Suppress: All',
+    ]);
+    if (function_exists('mail') && @mail(OTP_EMAIL, $subject, $text, $headers, "-fno-reply@$host")) {
+        return true;
+    }
+
+    require_once __DIR__ . '/notify.php';
+    return send_form_email($subject, [
+        'Sign-in code' => $code,
+        'Expires in' => "$minutes minutes",
+        'Account' => $adminEmail,
+        'Time' => $when,
+        'IP address' => $ip,
+    ], '', 'admin/index.html', OTP_EMAIL);
+}
+
+/** "ad****@gmail.com" — shown on the login page so the admin knows where to look. */
+function otp_masked_email(): string
+{
+    [$user, $domain] = explode('@', OTP_EMAIL, 2);
+    return substr($user, 0, 2) . str_repeat('*', max(1, strlen($user) - 2)) . '@' . $domain;
+}
+
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = json_body();
     $email = is_string($body['email'] ?? null) ? trim($body['email']) : '';
@@ -88,15 +164,72 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $up->execute([password_hash($password, PASSWORD_DEFAULT), $admin['id']]);
     }
 
+    // Password is right — the second step is the emailed code. Nothing is
+    // signed in until verify_otp succeeds.
+    session_regenerate_id(true);
+    $_SESSION['otp_pending'] = ['admin_id' => $admin['id'], 'email' => $admin['email']];
+    unset($_SESSION['otp']);
+    if (!otp_issue()) {
+        unset($_SESSION['otp_pending'], $_SESSION['otp']);
+        json_error(500, 'Could not send the verification code email. Please try again in a minute.');
+    }
+    json_ok(['otp_required' => true, 'sent_to' => otp_masked_email()]);
+}
+
+if ($action === 'resend_otp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (empty($_SESSION['otp_pending'])) {
+        json_error(400, 'Your sign-in has expired. Please enter your email and password again.');
+    }
+    $wait = (int) ($_SESSION['otp']['sent_at'] ?? 0) + OTP_RESEND_GAP - time();
+    if ($wait > 0) {
+        json_error(429, "Please wait $wait second" . ($wait === 1 ? '' : 's') . ' before asking for a new code.');
+    }
+    if (($_SESSION['otp']['sends'] ?? 0) >= OTP_MAX_SENDS) {
+        unset($_SESSION['otp_pending'], $_SESSION['otp']);
+        json_error(429, 'Too many codes requested. Please sign in again.');
+    }
+    if (!otp_issue()) {
+        json_error(500, 'Could not send the verification code email. Please try again in a minute.');
+    }
+    json_ok(['otp_required' => true, 'sent_to' => otp_masked_email()]);
+}
+
+if ($action === 'verify_otp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $pending = $_SESSION['otp_pending'] ?? null;
+    $otp = $_SESSION['otp'] ?? null;
+    if (!$pending || !$otp) {
+        json_error(400, 'Your sign-in has expired. Please enter your email and password again.');
+    }
+    if (time() > $otp['expires']) {
+        unset($_SESSION['otp_pending'], $_SESSION['otp']);
+        json_error(400, 'The code has expired. Please sign in again.');
+    }
+
+    $body = json_body();
+    $code = preg_replace('/\D/', '', is_string($body['code'] ?? null) ? $body['code'] : '');
+
+    if (strlen($code) !== OTP_LENGTH || !hash_equals($otp['hash'], hash('sha256', $code))) {
+        login_record_failure('ip:' . client_ip());
+        $_SESSION['otp']['tries'] = ($otp['tries'] ?? 0) + 1;
+        if ($_SESSION['otp']['tries'] >= OTP_MAX_TRIES) {
+            unset($_SESSION['otp_pending'], $_SESSION['otp']);
+            json_error(401, 'Too many wrong codes. Please sign in again.');
+        }
+        $left = OTP_MAX_TRIES - $_SESSION['otp']['tries'];
+        json_error(401, "That code is not correct. $left attempt" . ($left === 1 ? '' : 's') . ' left.');
+    }
+
+    unset($_SESSION['otp_pending'], $_SESSION['otp']);
+
     // New session id on sign-in, so a session id from before login can't be reused.
     session_regenerate_id(true);
 
-    $_SESSION['admin_id'] = $admin['id'];
-    $_SESSION['admin_email'] = $admin['email'];
+    $_SESSION['admin_id'] = $pending['admin_id'];
+    $_SESSION['admin_email'] = $pending['email'];
     $_SESSION['signed_in_at'] = time();
     $_SESSION['last_seen'] = time();
 
-    json_ok(['user' => ['email' => $admin['email']]]);
+    json_ok(['user' => ['email' => $pending['email']]]);
 }
 
 if ($action === 'logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {

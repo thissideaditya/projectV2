@@ -96,7 +96,22 @@
         headers: jsonHeaders(),
         body: JSON.stringify({ email: email, password: password }),
       });
+      // Password accepted: an emailed code is needed next (see verifyOtp).
+      return body;
+    },
+
+    /** Second sign-in step: the code emailed after the password was accepted. */
+    async verifyOtp(code) {
+      var body = await request("/auth.php?action=verify_otp", {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify({ code: code }),
+      });
       return body.user;
+    },
+
+    async resendOtp() {
+      return request("/auth.php?action=resend_otp", { method: "POST" });
     },
 
     /** Change the signed-in admin's password (needs the current one). */

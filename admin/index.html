@@ -34,6 +34,19 @@
       <button class="btn btn--gold btn--full" type="submit">Sign In</button>
     </form>
 
+    <form id="otp-form" hidden>
+      <div class="alert info" id="otp-info">A 6-digit code has been emailed. Enter it below.</div>
+      <div class="field" style="margin-bottom:1.5rem;">
+        <label for="otp">Verification code</label>
+        <input id="otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code" placeholder="6-digit code" style="letter-spacing:.3em;font-size:1.1rem;">
+      </div>
+      <button class="btn btn--gold btn--full" type="submit">Verify &amp; Sign In</button>
+      <p style="display:flex;justify-content:space-between;margin-top:1rem;font-size:.85rem;">
+        <a href="#" id="otp-resend" style="color:var(--ink-500);">Resend code</a>
+        <a href="#" id="otp-back" style="color:var(--ink-500);">Use a different account</a>
+      </p>
+    </form>
+
     <p style="text-align:center;margin-top:1.5rem;"><a href="../index.html" style="font-size:.85rem;color:var(--ink-500);">&larr; Back to website</a></p>
   </div>
 </div>
