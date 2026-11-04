@@ -2083,7 +2083,8 @@ body.disclaimer-active .cookie-banner { display: none; }
   content: ""; position: absolute; inset: 0; z-index: 3; padding: 1.5px; border-radius: inherit; pointer-events: none;
   background: conic-gradient(from var(--vb), rgba(201, 162, 39, .25) 0deg, rgba(201, 162, 39, .25) 220deg, #c9a227 285deg, #f6dc8a 320deg, #c9a227 345deg, rgba(201, 162, 39, .25) 360deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
-          mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
   opacity: 0; transition: opacity .35s var(--ease);
 }
 .video-card.feed-card:hover::before, .video-card.feed-card:focus-visible::before { opacity: 1; animation: video-border 2.6s linear infinite; }
