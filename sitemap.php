@@ -69,6 +69,15 @@ try {
             'priority'   => '0.6',
         ];
     }
+    $stmt = $pdo->query("SELECT slug, created_at FROM articles WHERE status = 'published' ORDER BY created_at DESC");
+    foreach ($stmt as $art) {
+        $urls[] = [
+            'loc'        => $base . '/article.php?slug=' . rawurlencode($art['slug']),
+            'lastmod'    => date('Y-m-d', strtotime($art['created_at'])),
+            'changefreq' => 'monthly',
+            'priority'   => '0.5',
+        ];
+    }
 } catch (Throwable $e) {
     // Leave posts out; the static pages above are still a valid sitemap.
 }

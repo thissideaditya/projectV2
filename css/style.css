@@ -1668,12 +1668,18 @@ body.disclaimer-active .cookie-banner { display: none; }
   .header-social { display: none; } /* keep the mobile header uncluttered; footer still carries the icons */
 }
 
-.read-more-toggle {
+.read-more-toggle, .article-desc-toggle {
   background: none; border: none; padding: 0; margin-top: .9rem;
   font-size: .85rem; font-weight: 700; color: var(--green-800);
   cursor: pointer;
 }
-.read-more-toggle:hover { color: var(--gold-700); text-decoration: underline; }
+.read-more-toggle:hover, .article-desc-toggle:hover { color: var(--gold-700); text-decoration: underline; }
+
+/* Article cards: long descriptions show 4 lines until "Read More" (js/articles-render.js). */
+.article-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; white-space: pre-line; }
+.article-desc.is-open { display: block; -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; }
+.article-desc-toggle { align-self: flex-start; margin: -.4rem 0 1rem; }
+.article-desc-toggle[hidden] { display: none; }
 
 /* ===================================================================
    HEADER OVER HERO
@@ -2062,6 +2068,12 @@ body.disclaimer-active .cookie-banner { display: none; }
 .magazine-page .magazine-cover { border-radius: 6px; border: 1px solid rgba(201, 162, 39, .3); box-shadow: var(--shadow-card); }
 .magazine-page .lede { margin-bottom: 1.75rem; }
 @media (max-width: 760px) { .magazine-page { grid-template-columns: 1fr; } .magazine-page .magazine-cover { max-width: 320px; } }
+/* Single article page (article.php): same layout, landscape cover; no cover -> one column. */
+.article-page { grid-template-columns: minmax(0, 420px) minmax(0, 1fr); }
+.article-page .magazine-cover { aspect-ratio: auto; }
+.article-page .magazine-cover img { height: auto; }
+.article-page--nocover { grid-template-columns: 1fr; max-width: 760px; }
+@media (max-width: 760px) { .article-page { grid-template-columns: 1fr; } .article-page .magazine-cover { max-width: 100%; } }
 
 .video-play { /* round gold-ringed play button, centred on the thumbnail */
   position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; translate: -50% -50%; border-radius: 50%;

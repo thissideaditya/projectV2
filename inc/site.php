@@ -297,15 +297,28 @@ function site_article_card(array $a): string
         : (in_array($type, ['doc', 'docx'], true) ? 'Document' : ($type === 'pdf' ? 'PDF' : strtoupper($type)));
     $parts = explode('/', (string) $a['file_url']);
     $fileName = end($parts) ?: 'download';
+    $pageUrl = 'article.php?slug=' . rawurlencode($a['slug']); // has the cover as og:image
+
+    $thumb = '';
+    if (!empty($a['cover_image']) && site_safe_url($a['cover_image']) !== '#') {
+        $thumb = '<a class="thumb" href="' . e($pageUrl) . '">'
+               .   '<img src="' . e(site_safe_url($a['cover_image'])) . '" alt="' . e($a['title']) . '" loading="lazy">'
+               . '</a>';
+    }
 
     return '<article class="post-card">'
+        . $thumb
         . '<div class="body">'
         .   '<span class="meta">' . e($typeLabel) . ' &middot; ' . site_date($a['created_at']) . '</span>'
         .   '<h3><a class="article-title-link" href="' . e(site_safe_url($openUrl)) . '" target="_blank" rel="noopener noreferrer">' . e($a['title']) . '</a></h3>'
-        .   ($a['description'] ? '<p>' . e($a['description']) . '</p>' : '')
+        .   ($a['description']
+                // Clamped by CSS; js/articles-render.js shows the toggle only if the text overflows.
+                ? '<p class="article-desc">' . e($a['description']) . '</p>'
+                  . '<button type="button" class="article-desc-toggle" aria-expanded="false" hidden>Read More</button>'
+                : '')
         .   '<div class="card-actions" style="justify-content:flex-start;">'
         .     '<a class="btn btn--sm btn--gold" href="' . e(site_safe_url($a['file_url'])) . '" download="' . e($fileName) . '">Download &darr;</a>'
-        .     site_share_button($a['file_url'], $a['title'])
+        .     site_share_button($pageUrl, $a['title'])
         .   '</div>'
         . '</div>'
         . '</article>';

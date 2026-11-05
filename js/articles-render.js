@@ -54,24 +54,65 @@
   function articleCard(article) {
     var fileName = (article.file_url || "").split("/").pop() || "download";
     var openUrl = viewerUrl(article);
+    // The article's own page carries the cover as og:image, so shared links show a thumbnail.
+    var pageUrl = "article.php?slug=" + encodeURIComponent(article.slug);
+    var coverSrc = article.cover_image ? safeUrl(article.cover_image) : "#";
+    var thumb = coverSrc !== "#"
+      ? '<a class="thumb" href="' + escapeHtml(pageUrl) + '"><img src="' + escapeHtml(coverSrc) + '" alt="' + escapeHtml(article.title) + '" loading="lazy"></a>'
+      : "";
     return (
       '<article class="post-card">' +
+        thumb +
         '<div class="body">' +
           '<span class="meta">' + escapeHtml(fileTypeLabel(article.file_type)) + " &middot; " + formatDate(article.created_at) + "</span>" +
           '<h3><a class="article-title-link" href="' + escapeHtml(safeUrl(openUrl)) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(article.title) + "</a></h3>" +
-          (article.description ? "<p>" + escapeHtml(article.description) + "</p>" : "") +
+          (article.description
+            ? '<p class="article-desc">' + escapeHtml(article.description) + "</p>" +
+              '<button type="button" class="article-desc-toggle" aria-expanded="false" hidden>Read More</button>'
+            : "") +
           '<div class="card-actions" style="justify-content:flex-start;">' +
             '<a class="btn btn--sm btn--gold" href="' + escapeHtml(safeUrl(article.file_url)) + '" download="' + escapeHtml(fileName) + '">Download &darr;</a>' +
-            (window.ADA_SHARE ? window.ADA_SHARE.button(article.file_url, article.title) : "") +
+            (window.ADA_SHARE ? window.ADA_SHARE.button(pageUrl, article.title) : "") +
           '</div>' +
         "</div>" +
       "</article>"
     );
   }
 
+  // Long descriptions are clamped to a few lines (CSS .article-desc). Show the
+  // Read More button only where the text is actually cut off.
+  function updateDescToggles() {
+    document.querySelectorAll(".article-desc").forEach(function (p) {
+      var btn = p.nextElementSibling;
+      if (!btn || !btn.classList.contains("article-desc-toggle")) return;
+      if (p.classList.contains("is-open")) { btn.hidden = false; return; }
+      btn.hidden = p.scrollHeight <= p.clientHeight + 1;
+    });
+  }
+
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest(".article-desc-toggle");
+    if (!btn) return;
+    var p = btn.previousElementSibling;
+    var open = !p.classList.contains("is-open");
+    p.classList.toggle("is-open", open);
+    btn.setAttribute("aria-expanded", String(open));
+    btn.textContent = open ? "Read Less" : "Read More";
+    // Collapsing a long description can leave the button above the screen; bring it back
+    if (!open && btn.getBoundingClientRect().top < 0) btn.scrollIntoView({ block: "center" });
+  });
+
+  var resizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(updateDescToggles, 150);
+  });
+  window.addEventListener("load", updateDescToggles); // fonts loaded -> line heights final
+
   async function renderArticles() {
     var mount = document.getElementById("articles-listing");
-    if (!mount || mount.hasAttribute("data-ssr")) return; // already rendered on the server (inc/site.php)
+    if (!mount) return;
+    if (mount.hasAttribute("data-ssr")) { updateDescToggles(); return; } // already rendered on the server (inc/site.php)
 
     try {
       // Never hang on "Loading…": give up after 15s and show a clear message.
@@ -87,6 +128,7 @@
       }
       mount.className = "grid post-grid";
       mount.innerHTML = articles.map(articleCard).join("");
+      updateDescToggles();
     } catch (err) {
       mount.innerHTML = '<div class="empty-state">Unable to load articles right now.</div>';
       console.error(err);

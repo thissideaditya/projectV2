@@ -60,6 +60,13 @@
           <input id="article-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx">
           <p class="form-note" id="article-file-label">No file chosen</p>
         </div>
+        <div class="field full">
+          <label for="article-cover">Cover Image (optional &mdash; JPG, PNG or WEBP, max 4MB)</label>
+          <input id="article-cover" type="file" accept="image/jpeg,image/png,image/webp">
+          <p class="form-note" id="article-cover-label">Shown on the article card, and as the thumbnail when the article is shared (WhatsApp, LinkedIn, etc.). A landscape image around 1200&times;630 works best.</p>
+          <img id="article-cover-preview" alt="Cover preview" hidden style="margin-top:.75rem;max-width:280px;border-radius:6px;border:1px solid var(--line);">
+          <p class="form-note" id="article-cover-remove-wrap" hidden><label style="display:inline-flex;align-items:center;gap:.4rem;font-weight:500;"><input type="checkbox" id="article-cover-remove"> Remove current cover</label></p>
+        </div>
         <div class="field">
           <label for="article-status">Status</label>
           <select id="article-status">

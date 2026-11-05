@@ -801,6 +801,18 @@
     var existingFileUrl = null;
     var existingFileType = null;
 
+    var coverInput = document.getElementById("article-cover");
+    var coverPreview = document.getElementById("article-cover-preview");
+    var coverRemove = document.getElementById("article-cover-remove");
+    var coverRemoveWrap = document.getElementById("article-cover-remove-wrap");
+    var existingCover = "";
+
+    function showCover(src) {
+      if (!coverPreview) return;
+      coverPreview.hidden = !src;
+      if (src) coverPreview.src = src;
+    }
+
     requireAuth().then(async function (session) {
       if (!session) return;
       if (editId) {
@@ -812,6 +824,11 @@
           document.getElementById("article-status").value = article.status || "draft";
           existingFileUrl = article.file_url || null;
           existingFileType = article.file_type || null;
+          existingCover = article.cover_image || "";
+          if (existingCover) {
+            showCover(existingCover);
+            if (coverRemoveWrap) coverRemoveWrap.hidden = false;
+          }
           if (existingFileUrl) {
             fileLabel.textContent = "Current file: " + existingFileUrl.split("/").pop() + " (choose a new file only to replace it)";
           }
@@ -828,9 +845,32 @@
       });
     }
 
+    if (coverInput) {
+      coverInput.addEventListener("change", function () {
+        var file = coverInput.files && coverInput.files[0];
+        if (file) {
+          if (coverRemove) coverRemove.checked = false;
+          showCover(URL.createObjectURL(file));
+        } else {
+          showCover(existingCover);
+        }
+      });
+    }
+    if (coverRemove) {
+      coverRemove.addEventListener("change", function () {
+        if (coverRemove.checked) {
+          if (coverInput) coverInput.value = "";
+          showCover("");
+        } else {
+          showCover(existingCover);
+        }
+      });
+    }
+
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
       var saveBtn = document.getElementById("article-save-btn");
+      var selectedCover = coverInput && coverInput.files && coverInput.files[0];
 
       var selectedFile = fileInput && fileInput.files && fileInput.files[0];
       if (!selectedFile && !existingFileUrl) {
@@ -851,11 +891,18 @@
           fileType = uploaded.file_type;
         }
 
+        var coverImage = coverRemove && coverRemove.checked ? "" : existingCover;
+        if (selectedCover) {
+          saveBtn.textContent = "Uploading cover…";
+          coverImage = await window.ADA.data.uploadImage(selectedCover);
+        }
+
         var payload = {
           title: document.getElementById("article-title").value.trim(),
           description: document.getElementById("article-description").value.trim(),
           file_url: fileUrl,
           file_type: fileType,
+          cover_image: coverImage,
           status: document.getElementById("article-status").value,
         };
 
