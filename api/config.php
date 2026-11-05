@@ -309,7 +309,19 @@ function looks_like_spam(array $data): bool
  */
 function delete_uploaded_file(?string $url): void
 {
-    if (!$url) return;
+    $path = uploaded_file_path($url);
+    if ($path && is_file($path)) {
+        @unlink($path);
+    }
+}
+
+/**
+ * The file on disk behind a URL this site uploaded (see delete_uploaded_file
+ * for the URL shapes), or null for anything else. Doesn't check it exists.
+ */
+function uploaded_file_path(?string $url): ?string
+{
+    if (!$url) return null;
     $path = null;
     $parts = parse_url($url);
     if (($parts['path'] ?? '') === MEDIA_URL_BASE && !empty($parts['query'])) {
@@ -322,9 +334,7 @@ function delete_uploaded_file(?string $url): void
     } elseif (preg_match('~^' . preg_quote(UPLOAD_URL_BASE, '~') . '/posts/([^/?#]+)$~', $parts['path'] ?? '', $m)) {
         $path = UPLOAD_DIR . '/posts/' . basename($m[1]);
     }
-    if ($path && is_file($path)) {
-        @unlink($path);
-    }
+    return $path;
 }
 
 /**

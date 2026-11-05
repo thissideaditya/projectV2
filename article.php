@@ -48,7 +48,11 @@ if ($art) {
 
     // Only a safe web/relative address may become the share image.
     $cover   = site_safe_url((string) $art['cover_image']) === '#' ? '' : (string) $art['cover_image'];
-    $ogImage = $cover ? article_abs_url($cover, $baseUrl) : $baseUrl . '/assets/images/og-default.jpg';
+    // Share preview: the cover placed on a 1200×630 green canvas (api/og-image.php),
+    // so WhatsApp etc. show the large banner. ?v changes with the cover so their caches refresh.
+    $ogImage = $cover
+        ? $baseUrl . '/api/og-image.php?type=article&slug=' . rawurlencode($art['slug']) . '&v=' . substr(md5($cover), 0, 8)
+        : $baseUrl . '/assets/images/og-default.jpg';
 
     $type = strtolower((string) $art['file_type']);
     $absoluteFile = article_abs_url((string) $art['file_url'], $baseUrl);
@@ -93,6 +97,11 @@ $crumbs = $art ? [['Insights', 'insights.html'], ['Articles', 'articles.html'], 
 <meta property="og:title" content="<?php echo h($ogTitle); ?>">
 <meta property="og:description" content="<?php echo h($ogDesc); ?>">
 <meta property="og:image" content="<?php echo h($ogImage); ?>">
+<?php if ($cover): ?>
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<?php endif; ?>
 <meta property="og:url" content="<?php echo h($ogUrl); ?>">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="<?php echo h($ogTitle); ?>">

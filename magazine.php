@@ -41,10 +41,10 @@ if ($mag) {
 
     // Only a safe web/relative address may become the share image.
     $cover = site_safe_url($mag['cover_image']) === '#' ? '' : (string) $mag['cover_image'];
-    if ($cover && preg_match('~^https?://~i', $cover)) {
-        $ogImage = $cover; // already a full URL
-    } elseif ($cover) {
-        $ogImage = $baseUrl . '/' . ltrim($cover, '/');
+    if ($cover) {
+        // Share preview: the cover placed on a 1200×630 green canvas (api/og-image.php),
+        // so WhatsApp etc. show the large banner. ?v changes with the cover so their caches refresh.
+        $ogImage = $baseUrl . '/api/og-image.php?type=magazine&slug=' . rawurlencode($mag['slug']) . '&v=' . substr(md5($cover), 0, 8);
     } else {
         $ogImage = $baseUrl . '/assets/images/og-default.jpg';
     }
@@ -87,6 +87,11 @@ $crumbs = $mag ? [['Insights', 'insights.html'], ['Magazines', 'magazines.html']
 <meta property="og:title" content="<?php echo h($ogTitle); ?>">
 <meta property="og:description" content="<?php echo h($ogDesc); ?>">
 <meta property="og:image" content="<?php echo h($ogImage); ?>">
+<?php if ($mag && $cover): ?>
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<?php endif; ?>
 <meta property="og:url" content="<?php echo h($ogUrl); ?>">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="<?php echo h($ogTitle); ?>">
