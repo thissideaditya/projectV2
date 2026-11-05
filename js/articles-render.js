@@ -58,7 +58,7 @@
     var pageUrl = "article.php?slug=" + encodeURIComponent(article.slug);
     var coverSrc = article.cover_image ? safeUrl(article.cover_image) : "#";
     var thumb = coverSrc !== "#"
-      ? '<a class="thumb" href="' + escapeHtml(pageUrl) + '"><img src="' + escapeHtml(coverSrc) + '" alt="' + escapeHtml(article.title) + '" loading="lazy"></a>'
+      ? '<a class="thumb article-thumb" href="' + escapeHtml(pageUrl) + '"><img src="' + escapeHtml(coverSrc) + '" alt="' + escapeHtml(article.title) + '" loading="lazy"></a>'
       : "";
     return (
       '<article class="post-card">' +

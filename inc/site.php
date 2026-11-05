@@ -301,7 +301,7 @@ function site_article_card(array $a): string
 
     $thumb = '';
     if (!empty($a['cover_image']) && site_safe_url($a['cover_image']) !== '#') {
-        $thumb = '<a class="thumb" href="' . e($pageUrl) . '">'
+        $thumb = '<a class="thumb article-thumb" href="' . e($pageUrl) . '">'
                .   '<img src="' . e(site_safe_url($a['cover_image'])) . '" alt="' . e($a['title']) . '" loading="lazy">'
                . '</a>';
     }
